@@ -6,7 +6,7 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
-	"strings"
+	_ "strings"
 	"text/template"
 
 	"github.com/sqlc-dev/plugin-sdk-go/plugin"
@@ -35,7 +35,6 @@ func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.Generat
 		}
 	}
 
-	enums := core.BuildEnums(req)
 	structs := core.BuildDataClasses(conf, req)
 	queries, err := core.BuildQueries(req, structs)
 	if err != nil {
@@ -44,7 +43,6 @@ func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.Generat
 
 	i := &core.Importer{
 		Settings:    req.Settings,
-		Enums:       enums,
 		DataClasses: structs,
 		Queries:     queries,
 	}
@@ -67,7 +65,6 @@ func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.Generat
 		Q:           `"""`,
 		Package:     conf.Package,
 		Queries:     queries,
-		Enums:       enums,
 		DataClasses: structs,
 		SqlcVersion: req.SqlcVersion,
 	}
@@ -83,20 +80,17 @@ func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.Generat
 		if err != nil {
 			return err
 		}
-		if !strings.HasSuffix(name, ".kt") {
-			name += ".kt"
-		}
 		output[name] = core.KtFormat(b.String())
 		return nil
 	}
 
-	if err := execute("Models.kt", modelsFile); err != nil {
+	if err := execute("Models.php", modelsFile); err != nil {
 		return nil, err
 	}
-	if err := execute("Queries.kt", ifaceFile); err != nil {
+	if err := execute("Queries.php", ifaceFile); err != nil {
 		return nil, err
 	}
-	if err := execute("QueriesImpl.kt", sqlFile); err != nil {
+	if err := execute("QueriesImpl.php", sqlFile); err != nil {
 		return nil, err
 	}
 

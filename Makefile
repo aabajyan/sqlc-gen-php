@@ -1,4 +1,4 @@
-.PHONY: build test
+.PHONY: build test bin/sqlc-gen-kotlin bin/sqlc-gen-kotlin.wasm
 
 build:
 	go build ./...

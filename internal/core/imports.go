@@ -10,7 +10,6 @@ import (
 type Importer struct {
 	Settings    *plugin.Settings
 	DataClasses []Struct
-	Enums       []Enum
 	Queries     []Query
 }
 
@@ -67,24 +66,8 @@ func (i *Importer) interfaceImports() [][]string {
 
 func (i *Importer) modelImports() [][]string {
 	std := make(map[string]struct{})
-	if i.usesType("Instant") {
-		std["java.time.Instant"] = struct{}{}
-		std["java.sql.Timestamp"] = struct{}{}
-	}
-	if i.usesType("LocalDate") {
-		std["java.time.LocalDate"] = struct{}{}
-	}
-	if i.usesType("LocalTime") {
-		std["java.time.LocalTime"] = struct{}{}
-	}
-	if i.usesType("LocalDateTime") {
-		std["java.time.LocalDateTime"] = struct{}{}
-	}
-	if i.usesType("OffsetDateTime") {
-		std["java.time.OffsetDateTime"] = struct{}{}
-	}
 	if i.usesType("UUID") {
-		std["java.util.UUID"] = struct{}{}
+		std["Symfony\\Component\\Uid\\Uuid"] = struct{}{}
 	}
 
 	stds := make([]string, 0, len(std))
@@ -97,28 +80,9 @@ func (i *Importer) modelImports() [][]string {
 }
 
 func stdImports(uses func(name string) bool) map[string]struct{} {
-	std := map[string]struct{}{
-		"java.sql.SQLException": {},
-		"java.sql.Statement":    {},
-	}
-	if uses("Instant") {
-		std["java.time.Instant"] = struct{}{}
-		std["java.sql.Timestamp"] = struct{}{}
-	}
-	if uses("LocalDate") {
-		std["java.time.LocalDate"] = struct{}{}
-	}
-	if uses("LocalTime") {
-		std["java.time.LocalTime"] = struct{}{}
-	}
-	if uses("LocalDateTime") {
-		std["java.time.LocalDateTime"] = struct{}{}
-	}
-	if uses("OffsetDateTime") {
-		std["java.time.OffsetDateTime"] = struct{}{}
-	}
+	std := map[string]struct{}{}
 	if uses("UUID") {
-		std["java.util.UUID"] = struct{}{}
+		std["Symfony\\Component\\Uid\\Uuid"] = struct{}{}
 	}
 
 	return std
@@ -164,7 +128,6 @@ func (i *Importer) queryImports(filename string) [][]string {
 	}
 
 	std := stdImports(uses)
-	std["java.sql.Connection"] = struct{}{}
 	if hasEnum() && i.Settings.Engine == "postgresql" {
 		std["java.sql.Types"] = struct{}{}
 	}

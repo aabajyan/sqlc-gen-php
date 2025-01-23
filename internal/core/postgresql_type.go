@@ -12,65 +12,65 @@ func postgresType(req *plugin.GenerateRequest, col *plugin.Column) (string, bool
 
 	switch columnType {
 	case "serial", "pg_catalog.serial4":
-		return "Int", false
+		return "int", false
 
 	case "bigserial", "pg_catalog.serial8":
-		return "Long", false
+		return "int", false
 
 	case "smallserial", "pg_catalog.serial2":
-		return "Short", false
+		return "int", false
 
 	case "integer", "int", "int4", "pg_catalog.int4":
-		return "Int", false
+		return "int", false
 
 	case "bigint", "pg_catalog.int8":
-		return "Long", false
+		return "int", false
 
 	case "smallint", "pg_catalog.int2":
-		return "Short", false
+		return "int", false
 
 	case "float", "double precision", "pg_catalog.float8":
-		return "Double", false
+		return "float", false
 
 	case "real", "pg_catalog.float4":
-		return "Float", false
+		return "float", false
 
 	case "pg_catalog.numeric":
-		return "java.math.BigDecimal", false
+		return "float", false
 
 	case "bool", "pg_catalog.bool":
-		return "Boolean", false
+		return "boolean", false
 
 	case "jsonb":
 		// TODO: support json and byte types
-		return "String", false
+		return "string", false
 
 	case "bytea", "blob", "pg_catalog.bytea":
-		return "String", false
+		return "string", false
 
 	case "date":
 		// Date and time mappings from https://jdbc.postgresql.org/documentation/head/java8-date-time.html
-		return "LocalDate", false
+		return "\\DateTimeImmutable", false
 
 	case "pg_catalog.time", "pg_catalog.timetz":
-		return "LocalTime", false
+		return "\\DateTimeImmutable", false
 
 	case "pg_catalog.timestamp":
-		return "LocalDateTime", false
+		return "\\DateTimeImmutable", false
 
 	case "pg_catalog.timestamptz", "timestamptz":
 		// TODO
-		return "OffsetDateTime", false
+		return "\\DateTimeImmutable", false
 
 	case "text", "pg_catalog.varchar", "pg_catalog.bpchar", "string":
-		return "String", false
+		return "string", false
 
 	case "uuid":
-		return "UUID", false
+		return "Uuid", false
 
 	case "inet":
 		// TODO
-		return "net.IP", false
+		return "string", false
 
 	case "void":
 		// TODO

@@ -16,8 +16,6 @@ import (
 	"github.com/sqlc-dev/sqlc-gen-kotlin/internal/inflection"
 )
 
-var ktIdentPattern = regexp.MustCompile("[^a-zA-Z0-9_]+")
-
 type Constant struct {
 	Name  string
 	Type  string
@@ -77,13 +75,6 @@ func jdbcSet(t ktType, idx int, name string) string {
 	if t.IsEnum && t.IsArray {
 		return fmt.Sprintf(`stmt.setArray(%d, conn.createArrayOf("%s", %s.map { v -> v.value }.toTypedArray()))`, idx, t.DataType, name)
 	}
-	if t.IsEnum {
-		if t.Engine == "postgresql" {
-			return fmt.Sprintf("stmt.setObject(%d, %s.value, %s)", idx, name, "Types.OTHER")
-		} else {
-			return fmt.Sprintf("stmt.setString(%d, %s.value)", idx, name)
-		}
-	}
 	if t.IsArray {
 		return fmt.Sprintf(`stmt.setArray(%d, conn.createArrayOf("%s", %s.toTypedArray()))`, idx, t.DataType, name)
 	}
@@ -96,7 +87,7 @@ func jdbcSet(t ktType, idx int, name string) string {
 	if t.IsUUID() {
 		return fmt.Sprintf("stmt.setObject(%d, %s)", idx, name)
 	}
-	return fmt.Sprintf("stmt.set%s(%d, %s)", t.Name, idx, name)
+	return fmt.Sprintf("'%d' => $%s,", idx, name)
 }
 
 type Params struct {
@@ -115,7 +106,7 @@ func (v Params) Args() string {
 	var out []string
 	fields := v.Struct.Fields
 	for _, f := range fields {
-		out = append(out, f.Name+": "+f.Type.String())
+		out = append(out, f.Type.String()+" $"+f.Name)
 	}
 	if len(v.binding) > 0 {
 		lookup := map[int]int{}
@@ -225,47 +216,6 @@ type Query struct {
 	Arg          Params
 }
 
-func ktEnumValueName(value string) string {
-	id := strings.Replace(value, "-", "_", -1)
-	id = strings.Replace(id, ":", "_", -1)
-	id = strings.Replace(id, "/", "_", -1)
-	id = ktIdentPattern.ReplaceAllString(id, "")
-	return strings.ToUpper(id)
-}
-
-func BuildEnums(req *plugin.GenerateRequest) []Enum {
-	var enums []Enum
-	for _, schema := range req.Catalog.Schemas {
-		if schema.Name == "pg_catalog" || schema.Name == "information_schema" {
-			continue
-		}
-		for _, enum := range schema.Enums {
-			var enumName string
-			if schema.Name == req.Catalog.DefaultSchema {
-				enumName = enum.Name
-			} else {
-				enumName = schema.Name + "_" + enum.Name
-			}
-			e := Enum{
-				Name:    dataClassName(enumName, req.Settings),
-				Comment: enum.Comment,
-			}
-			for _, v := range enum.Vals {
-				e.Constants = append(e.Constants, Constant{
-					Name:  ktEnumValueName(v),
-					Value: v,
-					Type:  e.Name,
-				})
-			}
-			enums = append(enums, e)
-		}
-	}
-	if len(enums) > 0 {
-		sort.Slice(enums, func(i, j int) bool { return enums[i].Name < enums[j].Name })
-	}
-	return enums
-}
-
 func dataClassName(name string, settings *plugin.Settings) string {
 	out := ""
 	for _, p := range strings.Split(name, "_") {
@@ -333,26 +283,9 @@ func (t ktType) String() string {
 	if t.IsArray {
 		v = fmt.Sprintf("List<%s>", v)
 	} else if t.IsNull {
-		v += "?"
+		v = "?" + v
 	}
 	return v
-}
-
-func (t ktType) jdbcSetter() string {
-	return "set" + t.jdbcType()
-}
-
-func (t ktType) jdbcType() string {
-	if t.IsArray {
-		return "Array"
-	}
-	if t.IsEnum || t.IsTime() {
-		return "Object"
-	}
-	if t.IsInstant() {
-		return "Timestamp"
-	}
-	return t.Name
 }
 
 func (t ktType) IsTime() bool {
@@ -494,11 +427,11 @@ func BuildQueries(req *plugin.GenerateRequest, structs []Struct) ([]Query, error
 			continue
 		}
 		if query.Cmd == metadata.CmdCopyFrom {
-			return nil, errors.New("Support for CopyFrom in Kotlin is not implemented")
+			return nil, errors.New("Support for CopyFrom in PHP is not implemented")
 		}
 
-		ql, args := jdbcSQL(query.Text, req.Settings.Engine)
-		refs, err := parseInts(args)
+		ql := query.Text
+		refs, err := parseInts(nil)
 		if err != nil {
 			return nil, fmt.Errorf("Invalid parameter reference: %w", err)
 		}
@@ -584,7 +517,6 @@ func BuildQueries(req *plugin.GenerateRequest, structs []Struct) ([]Query, error
 type KtTmplCtx struct {
 	Q           string
 	Package     string
-	Enums       []Enum
 	DataClasses []Struct
 	Queries     []Query
 	Settings    *plugin.Settings
@@ -596,10 +528,6 @@ type KtTmplCtx struct {
 	EmitJSONTags        bool
 	EmitPreparedQueries bool
 	EmitInterface       bool
-}
-
-func Offset(v int) int {
-	return v + 1
 }
 
 func KtFormat(s string) string {

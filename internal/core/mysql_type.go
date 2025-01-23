@@ -11,41 +11,37 @@ func mysqlType(req *plugin.GenerateRequest, col *plugin.Column) (string, bool) {
 	switch columnType {
 
 	case "varchar", "text", "char", "tinytext", "mediumtext", "longtext":
-		return "String", false
+		return "string", false
 
-	case "int", "integer", "smallint", "mediumint", "year":
-		return "Int", false
-
-	case "bigint":
-		return "Long", false
+	case "int", "integer", "smallint", "mediumint", "year", "bigint":
+		return "int", false
 
 	case "blob", "binary", "varbinary", "tinyblob", "mediumblob", "longblob":
-		return "String", false
+		return "string", false
 
 	case "double", "double precision", "real":
-		return "Double", false
+		return "float", false
 
 	case "decimal", "dec", "fixed":
-		return "String", false
+		return "string", false
 
 	case "enum":
-		// TODO: Proper Enum support
-		return "String", false
+		return "string", false
 
 	case "date", "datetime", "time":
-		return "LocalDateTime", false
+		return "\\DateTimeImmutable", false
 
 	case "timestamp":
 		return "Instant", false
 
 	case "boolean", "bool", "tinyint":
-		return "Boolean", false
+		return "boolean", false
 
 	case "json":
-		return "String", false
+		return "string", false
 
 	case "any":
-		return "Any", false
+		return "mixed", false
 
 	default:
 		for _, schema := range req.Catalog.Schemas {
