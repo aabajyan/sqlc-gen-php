@@ -15,14 +15,14 @@ import (
 	"github.com/sqlc-dev/sqlc-gen-kotlin/internal/core"
 )
 
-//go:embed tmpl/ktmodels.tmpl
-var ktModelsTmpl string
+//go:embed tmpl/models.tmpl
+var modelsTemplate string
 
-//go:embed tmpl/ktsql.tmpl
-var ktSqlTmpl string
+//go:embed tmpl/query_impl.tmpl
+var queryImplTemplate string
 
-//go:embed tmpl/ktiface.tmpl
-var ktIfaceTmpl string
+//go:embed tmpl/query_interface.tmpl
+var queryInterfaceTemplate string
 
 func Offset(v int) int {
 	return v + 1
@@ -51,30 +51,23 @@ func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.Generat
 		}
 	}
 
-	structs := core.BuildDataClasses(conf, req)
+	structs := core.BuildDataClasses(req)
 	queries, err := core.BuildQueries(req, structs)
 	if err != nil {
 		return nil, err
 	}
 
-	i := &core.Importer{
-		Settings:    req.Settings,
-		DataClasses: structs,
-		Queries:     queries,
-	}
-
 	funcMap := template.FuncMap{
 		"lowerTitle": sdk.LowerTitle,
 		"comment":    sdk.DoubleSlashComment,
-		"imports":    i.Imports,
 		"offset":     Offset,
 	}
 
-	modelsFile := template.Must(template.New("table").Funcs(funcMap).Parse(ktModelsTmpl))
-	sqlFile := template.Must(template.New("table").Funcs(funcMap).Parse(ktSqlTmpl))
-	ifaceFile := template.Must(template.New("table").Funcs(funcMap).Parse(ktIfaceTmpl))
+	modelsFile := template.Must(template.New("table").Funcs(funcMap).Parse(modelsTemplate))
+	sqlFile := template.Must(template.New("table").Funcs(funcMap).Parse(queryImplTemplate))
+	ifaceFile := template.Must(template.New("table").Funcs(funcMap).Parse(queryInterfaceTemplate))
 
-	tctx := core.KtTmplCtx{
+	tctx := core.PhpTmplCtx{
 		Settings:    req.Settings,
 		Package:     conf.Package,
 		Queries:     queries,
@@ -85,11 +78,14 @@ func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.Generat
 	output := map[string]string{}
 
 	execute := func(name string, t *template.Template) error {
+		tctx.SourceName = name
 		var b bytes.Buffer
 		w := bufio.NewWriter(&b)
-		tctx.SourceName = name
 		err := t.Execute(w, tctx)
-		w.Flush()
+		if err != nil {
+			return err
+		}
+		err = w.Flush()
 		if err != nil {
 			return err
 		}
