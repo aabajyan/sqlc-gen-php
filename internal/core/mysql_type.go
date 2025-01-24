@@ -5,52 +5,42 @@ import (
 	"github.com/sqlc-dev/plugin-sdk-go/sdk"
 )
 
-func mysqlType(req *plugin.GenerateRequest, col *plugin.Column) (string, bool) {
+func mysqlType(col *plugin.Column) string {
 	columnType := sdk.DataType(col.Type)
 
 	switch columnType {
 
 	case "varchar", "text", "char", "tinytext", "mediumtext", "longtext":
-		return "string", false
+		return "string"
 
 	case "int", "integer", "smallint", "mediumint", "year", "bigint":
-		return "int", false
+		return "int"
 
 	case "blob", "binary", "varbinary", "tinyblob", "mediumblob", "longblob":
-		return "string", false
+		return "string"
 
 	case "double", "double precision", "real":
-		return "float", false
+		return "float"
 
 	case "decimal", "dec", "fixed":
-		return "string", false
+		return "string"
 
 	case "enum":
-		return "string", false
+		return "string"
 
 	case "date", "datetime", "time", "timestamp":
-		return "\\DateTimeImmutable", false
+		return "\\DateTimeImmutable"
 
 	case "boolean", "bool", "tinyint":
-		return "boolean", false
+		return "boolean"
 
 	case "json":
-		return "string", false
+		return "string"
 
 	case "any":
-		return "mixed", false
+		return "mixed"
 
 	default:
-		for _, schema := range req.Catalog.Schemas {
-			for _, enum := range schema.Enums {
-				if columnType == enum.Name {
-					if schema.Name == req.Catalog.DefaultSchema {
-						return dataClassName(enum.Name), true
-					}
-					return dataClassName(schema.Name + "_" + enum.Name), true
-				}
-			}
-		}
-		return "Any", false
+		return "mixed"
 	}
 }

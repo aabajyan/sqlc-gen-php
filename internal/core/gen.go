@@ -145,7 +145,7 @@ func BuildDataClasses(req *plugin.GenerateRequest) []Struct {
 }
 
 func makePhpTypeFromSqlcColumn(req *plugin.GenerateRequest, col *plugin.Column) phpType {
-	typ, _ := mapSqlColumnTypeToPhpType(req, col)
+	typ := mapSqlColumnTypeToPhpType(req, col)
 	return phpType{
 		Name:     typ,
 		IsArray:  col.IsSqlcSlice,
@@ -155,14 +155,12 @@ func makePhpTypeFromSqlcColumn(req *plugin.GenerateRequest, col *plugin.Column) 
 	}
 }
 
-func mapSqlColumnTypeToPhpType(req *plugin.GenerateRequest, col *plugin.Column) (string, bool) {
+func mapSqlColumnTypeToPhpType(req *plugin.GenerateRequest, col *plugin.Column) string {
 	switch req.Settings.Engine {
 	case "mysql":
-		return mysqlType(req, col)
-	case "postgresql":
-		return postgresType(req, col)
+		return mysqlType(col)
 	default:
-		return "Any", false
+		return "Any"
 	}
 }
 
