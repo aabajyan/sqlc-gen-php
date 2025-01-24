@@ -6,6 +6,7 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
+	"strings"
 	_ "strings"
 	"text/template"
 
@@ -25,6 +26,21 @@ var ktIfaceTmpl string
 
 func Offset(v int) int {
 	return v + 1
+}
+
+func RemoveBlankLines(s string) string {
+	skipNextSpace := false
+	var lines []string
+	for _, l := range strings.Split(s, "\n") {
+		isSpace := len(strings.TrimSpace(l)) == 0
+		if !isSpace || !skipNextSpace {
+			lines = append(lines, l)
+		}
+		skipNextSpace = isSpace
+	}
+	o := strings.Join(lines, "\n")
+	o += "\n"
+	return o
 }
 
 func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.GenerateResponse, error) {
@@ -58,11 +74,8 @@ func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.Generat
 	sqlFile := template.Must(template.New("table").Funcs(funcMap).Parse(ktSqlTmpl))
 	ifaceFile := template.Must(template.New("table").Funcs(funcMap).Parse(ktIfaceTmpl))
 
-	core.DefaultImporter = i
-
 	tctx := core.KtTmplCtx{
 		Settings:    req.Settings,
-		Q:           `"""`,
 		Package:     conf.Package,
 		Queries:     queries,
 		DataClasses: structs,
@@ -80,7 +93,7 @@ func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.Generat
 		if err != nil {
 			return err
 		}
-		output[name] = core.KtFormat(b.String())
+		output[name] = RemoveBlankLines(b.String())
 		return nil
 	}
 

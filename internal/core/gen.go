@@ -4,16 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/sqlc-dev/plugin-sdk-go/metadata"
 	"github.com/sqlc-dev/plugin-sdk-go/plugin"
 	"github.com/sqlc-dev/plugin-sdk-go/sdk"
-
-	"github.com/sqlc-dev/sqlc-gen-kotlin/internal/inflection"
 )
 
 type Constant struct {
@@ -91,8 +87,7 @@ func jdbcSet(t ktType, idx int, name string) string {
 }
 
 type Params struct {
-	Struct  *Struct
-	binding []int
+	Struct *Struct
 }
 
 func (v Params) isEmpty() bool {
@@ -108,15 +103,6 @@ func (v Params) Args() string {
 	for _, f := range fields {
 		out = append(out, f.Type.String()+" $"+f.Name)
 	}
-	if len(v.binding) > 0 {
-		lookup := map[int]int{}
-		for i, v := range v.binding {
-			lookup[v] = i
-		}
-		sort.Slice(out, func(i, j int) bool {
-			return lookup[fields[i].ID] < lookup[fields[j].ID]
-		})
-	}
 	if len(out) < 3 {
 		return strings.Join(out, ", ")
 	}
@@ -128,20 +114,13 @@ func (v Params) Bindings() string {
 		return ""
 	}
 	var out []string
-	if len(v.binding) > 0 {
-		for i, idx := range v.binding {
-			f := v.Struct.Fields[idx-1]
-			out = append(out, jdbcSet(f.Type, i+1, f.Name))
-		}
-	} else {
-		for i, f := range v.Struct.Fields {
-			out = append(out, jdbcSet(f.Type, i+1, f.Name))
-		}
+	for i, f := range v.Struct.Fields {
+		out = append(out, jdbcSet(f.Type, i+1, f.Name))
 	}
 	return indent(strings.Join(out, "\n"), 10, 0)
 }
 
-func jdbcGet(t ktType, idx int) string {
+func jdbcGet(t ktType, idx int, name string) string {
 	if t.IsEnum && t.IsArray {
 		return fmt.Sprintf(`(results.getArray(%d).array as Array<String>).map { v -> %s.lookup(v)!! }.toList()`, idx, t.Name)
 	}
@@ -158,28 +137,20 @@ func jdbcGet(t ktType, idx int) string {
 		return fmt.Sprintf(`results.getTimestamp(%d).toInstant()`, idx)
 	}
 	if t.IsUUID() {
-		var nullCast string
-		if t.IsNull {
-			nullCast = "?"
-		}
-		return fmt.Sprintf(`results.getObject(%d) as%s %s`, idx, nullCast, t.Name)
+		return fmt.Sprintf(`$row["%s"] == null ? null : Uuid::fromString($row["%s"])`, name, name)
 	}
 	if t.IsBigDecimal() {
 		return fmt.Sprintf(`results.getBigDecimal(%d)`, idx)
 	}
-	return fmt.Sprintf(`results.get%s(%d)`, t.Name, idx)
+	return fmt.Sprintf(`$row["%s"]`, name)
 }
 
 func (v QueryValue) ResultSet() string {
 	var out []string
-	if v.Struct == nil {
-		return jdbcGet(v.Typ, 1)
-	}
 	for i, f := range v.Struct.Fields {
-		out = append(out, jdbcGet(f.Type, i+1))
+		out = append(out, jdbcGet(f.Type, i+1, f.Name))
 	}
 	ret := indent(strings.Join(out, ",\n"), 4, -1)
-	ret = indent(v.Struct.Name+"(\n"+ret+"\n)", 12, 0)
 	return ret
 }
 
@@ -242,12 +213,6 @@ func BuildDataClasses(conf Config, req *plugin.GenerateRequest) []Struct {
 				tableName = schema.Name + "_" + table.Rel.Name
 			}
 			structName := dataClassName(tableName, req.Settings)
-			if !conf.EmitExactTableNames {
-				structName = inflection.Singular(inflection.SingularParams{
-					Name:       structName,
-					Exclusions: conf.InflectionExcludeTableNames,
-				})
-			}
 			s := Struct{
 				Table:   plugin.Identifier{Schema: schema.Name, Name: table.Rel.Name},
 				Name:    structName,
@@ -385,38 +350,6 @@ func ktColumnName(c *plugin.Column, pos int) string {
 	return fmt.Sprintf("column_%d", pos+1)
 }
 
-var postgresPlaceholderRegexp = regexp.MustCompile(`\B\$\d+\b`)
-
-// HACK: jdbc doesn't support numbered parameters, so we need to transform them to question marks...
-// But there's no access to the SQL parser here, so we just do a dumb regexp replace instead. This won't work if
-// the literal strings contain matching values, but good enough for a prototype.
-func jdbcSQL(s, engine string) (string, []string) {
-	if engine != "postgresql" {
-		return s, nil
-	}
-	var args []string
-	q := postgresPlaceholderRegexp.ReplaceAllStringFunc(s, func(placeholder string) string {
-		args = append(args, placeholder)
-		return "?"
-	})
-	return q, args
-}
-
-func parseInts(s []string) ([]int, error) {
-	if len(s) == 0 {
-		return nil, nil
-	}
-	var refs []int
-	for _, v := range s {
-		i, err := strconv.Atoi(strings.TrimPrefix(v, "$"))
-		if err != nil {
-			return nil, err
-		}
-		refs = append(refs, i)
-	}
-	return refs, nil
-}
-
 func BuildQueries(req *plugin.GenerateRequest, structs []Struct) ([]Query, error) {
 	qs := make([]Query, 0, len(req.Queries))
 	for _, query := range req.Queries {
@@ -427,14 +360,10 @@ func BuildQueries(req *plugin.GenerateRequest, structs []Struct) ([]Query, error
 			continue
 		}
 		if query.Cmd == metadata.CmdCopyFrom {
-			return nil, errors.New("Support for CopyFrom in PHP is not implemented")
+			return nil, errors.New("support for CopyFrom in PHP is not implemented")
 		}
 
 		ql := query.Text
-		refs, err := parseInts(nil)
-		if err != nil {
-			return nil, fmt.Errorf("Invalid parameter reference: %w", err)
-		}
 		gq := Query{
 			Cmd:          query.Cmd,
 			ClassName:    strings.Title(query.Name),
@@ -455,8 +384,7 @@ func BuildQueries(req *plugin.GenerateRequest, structs []Struct) ([]Query, error
 		}
 		params := ktColumnsToStruct(req, gq.ClassName+"Bindings", cols, ktParamName)
 		gq.Arg = Params{
-			Struct:  params,
-			binding: refs,
+			Struct: params,
 		}
 
 		if len(query.Columns) == 1 {
@@ -515,7 +443,6 @@ func BuildQueries(req *plugin.GenerateRequest, structs []Struct) ([]Query, error
 }
 
 type KtTmplCtx struct {
-	Q           string
 	Package     string
 	DataClasses []Struct
 	Queries     []Query
@@ -528,20 +455,4 @@ type KtTmplCtx struct {
 	EmitJSONTags        bool
 	EmitPreparedQueries bool
 	EmitInterface       bool
-}
-
-func KtFormat(s string) string {
-	// TODO: do more than just skip multiple blank lines, like maybe run ktlint to format
-	skipNextSpace := false
-	var lines []string
-	for _, l := range strings.Split(s, "\n") {
-		isSpace := len(strings.TrimSpace(l)) == 0
-		if !isSpace || !skipNextSpace {
-			lines = append(lines, l)
-		}
-		skipNextSpace = isSpace
-	}
-	o := strings.Join(lines, "\n")
-	o += "\n"
-	return o
 }

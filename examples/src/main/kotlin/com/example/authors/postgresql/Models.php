@@ -5,9 +5,13 @@
 
 namespace com\example\authors\postgresql;
 
-class Author {
-  private int $id;
-  private string $name;
-  private ?string $bio;
+class Authors {
+  public function __construct(
+  public int $id,
+  public string $name,
+  public ?string $bio,
+    )
+    {
+    }
 }
 

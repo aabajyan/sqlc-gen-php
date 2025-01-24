@@ -28,10 +28,10 @@ func (i *Importer) Imports(filename string) [][]string {
 	switch filename {
 	case "Models.kt":
 		return i.modelImports()
-	case "Querier.kt":
+	case "Queries.kt":
 		return i.interfaceImports()
 	default:
-		return i.queryImports(filename)
+		return i.queryImports()
 	}
 }
 
@@ -88,7 +88,7 @@ func stdImports(uses func(name string) bool) map[string]struct{} {
 	return std
 }
 
-func (i *Importer) queryImports(filename string) [][]string {
+func (i *Importer) queryImports() [][]string {
 	uses := func(name string) bool {
 		for _, q := range i.Queries {
 			if !q.Ret.isEmpty() {
@@ -114,23 +114,7 @@ func (i *Importer) queryImports(filename string) [][]string {
 		return false
 	}
 
-	hasEnum := func() bool {
-		for _, q := range i.Queries {
-			if !q.Arg.isEmpty() {
-				for _, f := range q.Arg.Struct.Fields {
-					if f.Type.IsEnum {
-						return true
-					}
-				}
-			}
-		}
-		return false
-	}
-
 	std := stdImports(uses)
-	if hasEnum() && i.Settings.Engine == "postgresql" {
-		std["java.sql.Types"] = struct{}{}
-	}
 
 	stds := make([]string, 0, len(std))
 	for s := range std {

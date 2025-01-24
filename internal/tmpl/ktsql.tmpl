@@ -9,6 +9,7 @@ namespace {{.Package}};
 {{range .}}use {{.}}
 {{end}}
 {{end}}
+use Doctrine\DBAL\Connection;
 
 {{range .Queries}}
 const {{.ConstantName}} = "-- name: {{.MethodName}} {{.Cmd}}
@@ -16,6 +17,7 @@ const {{.ConstantName}} = "-- name: {{.MethodName}} {{.Cmd}}
 ";
 
 {{if .Ret.EmitStruct}}
+//TODO
 data class {{.Ret.Type}} ( {{- range $i, $e := .Ret.Struct.Fields}}
   {{- if $i }},{{end}}
   val {{.Name}}: {{.Type}}
@@ -25,7 +27,7 @@ data class {{.Ret.Type}} ( {{- range $i, $e := .Ret.Struct.Fields}}
 {{end}}
 
 class QueriesImpl implements Queries {
-    public function __construct(private EntityManagerInterface $entityManager)
+    public function __construct(private Connection $connection)
     {
     }
 {{range .Queries}}
@@ -34,19 +36,23 @@ class QueriesImpl implements Queries {
 {{end}}
     public function {{.MethodName}}({{.Arg.Args}}): ?{{.Ret.Type}}
    {
-    return conn.prepareStatement({{.ConstantName}}).use { stmt ->
-      {{.Arg.Bindings}}
+       $params = [
+        {{ .Arg.Bindings }}
+        ];
+        $query = $this->connection->executeQuery({{.ConstantName}}, $params);
+        $results = $query->fetchAllAssociative();
+        /**
+        *  @var $ret array<{{.Ret.Type}}>
+        */
+        $ret = [];
+        if(count($results) != 1){
+            throw new Exception("NOT 1 ROW RETURNED");
+        }
+        foreach ($results as $row) {
+            $ret[] = new {{.Ret.Type}}({{.Ret.ResultSet}});
+        }
 
-      val results = stmt.executeQuery()
-      if (!results.next()) {
-        return null
-      }
-      val ret = {{.Ret.ResultSet}}
-      if (results.next()) {
-          throw SQLException("expected one row in result set, but got many")
-      }
-      ret
-    }
+        return $ret[0];
   }
 {{end}}
 
@@ -55,16 +61,19 @@ class QueriesImpl implements Queries {
 {{end}}
 public function {{.MethodName}}({{.Arg.Args}}): array
 {
-    return conn.prepareStatement({{.ConstantName}}).use { stmt ->
-      {{.Arg.Bindings}}
-
-      val results = stmt.executeQuery()
-      val ret = mutableListOf<{{.Ret.Type}}>()
-      while (results.next()) {
-          ret.add({{.Ret.ResultSet}})
+    $params = [
+    {{ .Arg.Bindings }}
+    ];
+    $query = $this->connection->executeQuery({{.ConstantName}}, $params);
+    $results = $query->fetchAllAssociative();
+    /**
+    *  @var $ret array<{{.Ret.Type}}>
+    */
+      $ret = [];
+      foreach ($results as $row) {
+          $ret[] = new {{.Ret.Type}}({{.Ret.ResultSet}});
       }
-      ret
-    }
+      return $ret;
   }
 {{end}}
 
@@ -74,11 +83,10 @@ public function {{.MethodName}}({{.Arg.Args}}): array
   {{ if $.EmitInterface }}override {{ end -}}
 public function {{.MethodName}}({{.Arg.Args}}): void
 {
-    conn.prepareStatement({{.ConstantName}}).use { stmt ->
-      {{ .Arg.Bindings }}
-
-      stmt.execute()
-    }
+    $params = [
+    {{ .Arg.Bindings }}
+    ];
+    $this->connection->executeQuery({{.ConstantName}}, $params);
   }
 {{end}}
 
@@ -88,12 +96,12 @@ public function {{.MethodName}}({{.Arg.Args}}): void
   {{ if $.EmitInterface }}override {{ end -}}
 public function {{.MethodName}}({{.Arg.Args}}): int
 {
-    return conn.prepareStatement({{.ConstantName}}).use { stmt ->
-      {{ .Arg.Bindings }}
+    $params = [
+        {{ .Arg.Bindings }}
+    ];
+    $this->connection->executeQuery({{.ConstantName}}, $params);
 
-      stmt.execute()
-      stmt.updateCount
-    }
+    return $this->connection->lastInsertId();
   }
 {{end}}
 
@@ -105,10 +113,9 @@ public function {{.MethodName}}({{.Arg.Args}}): int {
     $params = [
         {{ .Arg.Bindings }}
     ];
-    $this->entityManager->getConnection()->executeQuery({{.ConstantName}}, $params);
+    $this->connection->executeQuery({{.ConstantName}}, $params);
 
-    return $this->entityManager->getConnection()->lastInsertId();
-}
+    return $this->connection->lastInsertId();
   }
 {{end}}
 {{end}}

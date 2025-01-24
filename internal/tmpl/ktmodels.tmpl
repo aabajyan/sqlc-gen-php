@@ -12,11 +12,16 @@ namespace {{.Package}};
 
 {{range .DataClasses}}
 {{if .Comment}}{{comment .Comment}}{{end}}
-class {{.Name}} { {{- range $i, $e := .Fields}}
+class {{.Name}} {
+  public function __construct(
+  {{- range $i, $e := .Fields}}
   {{- if .Comment}}
   {{comment .Comment}}{{else}}
   {{- end}}
-  private {{.Type}} ${{.Name}};
-  {{- end}}
+  public {{.Type}} ${{.Name}},
+    {{- end}}
+    )
+    {
+    }
 }
 {{end}}

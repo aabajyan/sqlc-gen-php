@@ -5,6 +5,8 @@
 
 namespace com\example\authors\postgresql;
 
+use Doctrine\DBAL\Connection;
+
 const createAuthor = "-- name: createAuthor :one
 INSERT INTO authors (
           name, bio
@@ -30,77 +32,82 @@ ORDER BY name
 ";
 
 class QueriesImpl implements Queries {
-    public function __construct(private EntityManagerInterface $entityManager)
+    public function __construct(private Connection $connection)
     {
     }
 
-    public function createAuthor(string $name, ?string $bio): ?Author
+    public function createAuthor(string $name, ?string $bio): ?Authors
    {
-    return conn.prepareStatement(createAuthor).use { stmt ->
-      '1' => $name,
+       $params = [
+        '1' => $name,
           '2' => $bio,
+        ];
+        $query = $this->connection->executeQuery(createAuthor, $params);
+        $results = $query->fetchAllAssociative();
+        /**
+        *  @var $ret array<Authors>
+        */
+        $ret = [];
+        if(count($results) != 1){
+            throw new Exception("NOT 1 ROW RETURNED");
+        }
+        foreach ($results as $row) {
+            $ret[] = new Authors(    $row["id"],
+    $row["name"],
+    $row["bio"]);
+        }
 
-      val results = stmt.executeQuery()
-      if (!results.next()) {
-        return null
-      }
-      val ret = Author(
-                results.getint(1),
-                results.getstring(2),
-                results.getstring(3)
-            )
-      if (results.next()) {
-          throw SQLException("expected one row in result set, but got many")
-      }
-      ret
-    }
+        return $ret[0];
   }
 
   public function deleteAuthor(int $id): void
 {
-    conn.prepareStatement(deleteAuthor).use { stmt ->
-      '1' => $id,
-
-      stmt.execute()
-    }
+    $params = [
+    '1' => $id,
+    ];
+    $this->connection->executeQuery(deleteAuthor, $params);
   }
 
-    public function getAuthor(int $id): ?Author
+    public function getAuthor(int $id): ?Authors
    {
-    return conn.prepareStatement(getAuthor).use { stmt ->
-      '1' => $id,
+       $params = [
+        '1' => $id,
+        ];
+        $query = $this->connection->executeQuery(getAuthor, $params);
+        $results = $query->fetchAllAssociative();
+        /**
+        *  @var $ret array<Authors>
+        */
+        $ret = [];
+        if(count($results) != 1){
+            throw new Exception("NOT 1 ROW RETURNED");
+        }
+        foreach ($results as $row) {
+            $ret[] = new Authors(    $row["id"],
+    $row["name"],
+    $row["bio"]);
+        }
 
-      val results = stmt.executeQuery()
-      if (!results.next()) {
-        return null
-      }
-      val ret = Author(
-                results.getint(1),
-                results.getstring(2),
-                results.getstring(3)
-            )
-      if (results.next()) {
-          throw SQLException("expected one row in result set, but got many")
-      }
-      ret
-    }
+        return $ret[0];
   }
 
 public function listAuthors(): array
 {
-    return conn.prepareStatement(listAuthors).use { stmt ->
-      
-      val results = stmt.executeQuery()
-      val ret = mutableListOf<Author>()
-      while (results.next()) {
-          ret.add(Author(
-                results.getint(1),
-                results.getstring(2),
-                results.getstring(3)
-            ))
+    $params = [
+    
+    ];
+    $query = $this->connection->executeQuery(listAuthors, $params);
+    $results = $query->fetchAllAssociative();
+    /**
+    *  @var $ret array<Authors>
+    */
+      $ret = [];
+      foreach ($results as $row) {
+          $ret[] = new Authors(    $row["id"],
+    $row["name"],
+    $row["bio"]);
       }
-      ret
-    }
+      return $ret;
   }
 
 }

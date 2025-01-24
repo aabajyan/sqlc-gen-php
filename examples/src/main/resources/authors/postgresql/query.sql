@@ -1,13 +1,13 @@
 -- name: GetAuthor :one
-SELECT * FROM authors
+SELECT * FROM author
 WHERE id = $1 LIMIT 1;
 
 -- name: ListAuthors :many
-SELECT * FROM authors
+SELECT * FROM author
 ORDER BY name;
 
 -- name: CreateAuthor :one
-INSERT INTO authors (
+INSERT INTO author (
           name, bio
 ) VALUES (
   $1, $2
@@ -15,5 +15,5 @@ INSERT INTO authors (
 RETURNING *;
 
 -- name: DeleteAuthor :exec
-DELETE FROM authors
+DELETE FROM author
 WHERE id = $1;
