@@ -195,21 +195,9 @@ func phpColumnsToStruct(req *plugin.GenerateRequest, name string, columns []goCo
 	return &gs
 }
 
-func phpFunctionArgumentName(name string) string {
-	out := ""
-	for i, p := range strings.Split(name, "_") {
-		if i == 0 {
-			out += strings.ToLower(p)
-		} else {
-			out += strings.Title(p)
-		}
-	}
-	return out
-}
-
 func phpParamName(c *plugin.Column, number int) string {
 	if c.Name != "" {
-		return phpFunctionArgumentName(c.Name)
+		return c.Name
 	}
 	return fmt.Sprintf("dollar_%d", number)
 }
@@ -237,7 +225,7 @@ func BuildQueries(req *plugin.GenerateRequest, structs []Struct) ([]Query, error
 		ql := query.Text
 		gq := Query{
 			Cmd:          query.Cmd,
-			ClassName:    cases.Title(language.English).String(query.Name),
+			ClassName:    strings.ToUpper(query.Name[:1]) + query.Name[1:],
 			ConstantName: sdk.LowerTitle(query.Name),
 			FieldName:    sdk.LowerTitle(query.Name) + "Stmt",
 			MethodName:   sdk.LowerTitle(query.Name),
