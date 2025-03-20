@@ -22,10 +22,10 @@ interface Queries {
   public function {{.MethodName}}({{.Arg.Args}}): void;
   {{- end}}
   {{- if eq .Cmd ":execrows"}}
-  public function {{.MethodName}}({{.Arg.Args}}): int;
+  public function {{.MethodName}}({{.Arg.Args}}): int|string;
   {{- end}}
   {{- if eq .Cmd ":execresult"}}
-  public function {{.MethodName}}({{.Arg.Args}}): int;
+  public function {{.MethodName}}({{.Arg.Args}}): int|string;
   {{- end}}
   {{end}}
 }

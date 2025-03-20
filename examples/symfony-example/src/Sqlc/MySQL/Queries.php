@@ -23,7 +23,7 @@ interface Queries {
   */
   public function bookByTitleYear(string $uuidToBin, int $yr): array;
   
-  public function createAuthor(string $name): int;
+  public function createAuthor(string $name): int|string;
   
   public function createBook(
       int $authorId,
@@ -32,7 +32,7 @@ interface Queries {
       string $uuidToBin,
       int $yr,
       \DateTimeImmutable $available,
-      string $tags): int;
+      string $tags): int|string;
   
   public function deleteAuthorBeforeYear(int $yr, int $authorId): void;
   

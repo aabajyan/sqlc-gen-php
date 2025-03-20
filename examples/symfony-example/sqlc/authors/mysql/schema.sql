@@ -17,7 +17,6 @@ CREATE TABLE book (
     -- CONSTRAINT FOREIGN KEY (author_id) REFERENCES authors(author_id)
 ) ENGINE=InnoDB;
 
-CREATE INDEX books_title_idx ON book(title(255), yr);
 
 /*
 CREATE FUNCTION say_hello(s text) RETURNS text

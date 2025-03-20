@@ -20,9 +20,10 @@ class TestController extends AbstractController
     public function test(): JsonResponse
     {
         try {
-            (new QueriesImpl($this->connection))->createBook(
+            $id = (new QueriesImpl($this->connection))->createBook(
                 authorId: 3, isbn: "someISBN", bookType: "someType", uuidToBin: Uuid::v7()->toString(), yr: 2323, available: new \DateTimeImmutable(), tags: "kausimausi"
             );
+            var_dump($id);
         } catch (Exception $e) {
             var_dump($e);
         }

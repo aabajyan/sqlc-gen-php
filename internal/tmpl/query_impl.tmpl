@@ -106,7 +106,7 @@ final readonly class QueriesImpl implements Queries {
     /**
     * @throws Exception
     */
-    public function {{.MethodName}}({{.Arg.Args}}): int
+    public function {{.MethodName}}({{.Arg.Args}}): int|string
     {
         $params = [
             {{ .Arg.Bindings }}
@@ -126,7 +126,7 @@ final readonly class QueriesImpl implements Queries {
     /**
     * @throws Exception
     */
-    public function {{.MethodName}}({{.Arg.Args}}): int {
+    public function {{.MethodName}}({{.Arg.Args}}): int|string {
         $params = [
             {{ .Arg.Bindings }}
         ];

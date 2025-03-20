@@ -16,10 +16,11 @@ type Query struct {
 }
 
 type Field struct {
-	ID      int
-	Name    string
-	Type    phpType
-	Comment string
+	ID                 int
+	Name               string
+	OriginalColumnName string
+	Type               phpType
+	Comment            string
 }
 
 type ModelClass struct {

@@ -119,7 +119,7 @@ final readonly class QueriesImpl implements Queries {
         */
           $ret = [];
           foreach ($results as $row) {
-              $ret[] = new BookByTagsRow(    $row["bookId"],
+              $ret[] = new BookByTagsRow(    $row["book_id"],
     $row["title"],
     $row["name"],
     $row["isbn"],
@@ -146,7 +146,7 @@ final readonly class QueriesImpl implements Queries {
         */
           $ret = [];
           foreach ($results as $row) {
-              $ret[] = new BookByTagsMultipleRow(    $row["bookId"],
+              $ret[] = new BookByTagsMultipleRow(    $row["book_id"],
     $row["title"],
     $row["name"],
     $row["isbn"],
@@ -175,10 +175,10 @@ final readonly class QueriesImpl implements Queries {
         */
           $ret = [];
           foreach ($results as $row) {
-              $ret[] = new Book(    $row["bookId"],
-    $row["authorId"],
+              $ret[] = new Book(    $row["book_id"],
+    $row["author_id"],
     $row["isbn"],
-    $row["bookType"],
+    $row["book_type"],
     $row["title"],
     $row["yr"],
     $row["available"] == null ? null : new \DateTimeImmutable($row["available"]),
@@ -190,7 +190,7 @@ final readonly class QueriesImpl implements Queries {
     /**
     * @throws Exception
     */
-    public function createAuthor(string $name): int {
+    public function createAuthor(string $name): int|string {
         $params = [
             $name,
         ];
@@ -212,7 +212,7 @@ final readonly class QueriesImpl implements Queries {
       string $uuidToBin,
       int $yr,
       \DateTimeImmutable $available,
-      string $tags): int {
+      string $tags): int|string {
         $params = [
             $authorId,
           $isbn,
@@ -287,7 +287,7 @@ final readonly class QueriesImpl implements Queries {
             throw new \Exception("NOT 1 ROW RETURNED");
         }
         foreach ($results as $row) {
-            $ret[] = new Author(    $row["authorId"],
+            $ret[] = new Author(    $row["author_id"],
     $row["name"]);
         }
 
@@ -315,10 +315,10 @@ final readonly class QueriesImpl implements Queries {
             throw new \Exception("NOT 1 ROW RETURNED");
         }
         foreach ($results as $row) {
-            $ret[] = new Book(    $row["bookId"],
-    $row["authorId"],
+            $ret[] = new Book(    $row["book_id"],
+    $row["author_id"],
     $row["isbn"],
-    $row["bookType"],
+    $row["book_type"],
     $row["title"],
     $row["yr"],
     $row["available"] == null ? null : new \DateTimeImmutable($row["available"]),

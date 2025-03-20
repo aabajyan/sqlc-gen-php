@@ -4,61 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="308a9423-f741-466c-90d7-c345ef31e93d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/examples/go.mod" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/go.sum" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/symfony-example/gen.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/aws.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/kotlinc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sqlc-gen-kotlin.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+    <list default="true" id="308a9423-f741-466c-90d7-c345ef31e93d" name="Changes" comment="generate the model classes into seperate files">
+      <change afterPath="$PROJECT_DIR$/examples/symfony-example/tests/PersistenceTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/symfony-example/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/examples/symfony-example/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/symfony-example/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/examples/symfony-example/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/symfony-example/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/examples/symfony-example/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/symfony-example/sqlc/authors/mysql/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/examples/symfony-example/sqlc/authors/mysql/schema.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/symfony-example/src/Controller/TestController.php" beforeDir="false" afterPath="$PROJECT_DIR$/examples/symfony-example/src/Controller/TestController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/symfony-example/src/Sqlc/MySQL/Queries.php" beforeDir="false" afterPath="$PROJECT_DIR$/examples/symfony-example/src/Sqlc/MySQL/Queries.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/symfony-example/src/Sqlc/MySQL/QueriesImpl.php" beforeDir="false" afterPath="$PROJECT_DIR$/examples/symfony-example/src/Sqlc/MySQL/QueriesImpl.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/symfony-example/symfony.lock" beforeDir="false" afterPath="$PROJECT_DIR$/examples/symfony-example/symfony.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/core/gen.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/core/gen.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/core/models.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/core/models.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/gen.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gen.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/tmpl/models.tmpl" beforeDir="false" afterPath="$PROJECT_DIR$/internal/tmpl/models.tmpl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/tmpl/query_impl.tmpl" beforeDir="false" afterPath="$PROJECT_DIR$/internal/tmpl/query_impl.tmpl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/tmpl/query_interface.tmpl" beforeDir="false" afterPath="$PROJECT_DIR$/internal/tmpl/query_interface.tmpl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/.env" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/.env.dev" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/composer.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/composer.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/config/bundles.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/config/packages/cache.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/config/packages/doctrine.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/config/packages/doctrine_migrations.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/config/packages/framework.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/config/packages/routing.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/config/preload.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/config/routes.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/config/routes/framework.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/config/services.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/gen.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/migrations/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/public/index.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/sqlc.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/sqlc/authors/mysql/query.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/sqlc/authors/mysql/schema.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/sqlc/authors/postgresql/query.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/sqlc/authors/postgresql/schema.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/src/Controller/TestController.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/src/Kernel.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/src/Sqlc/MySQL/Models.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/src/Sqlc/MySQL/Queries.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/src/Sqlc/MySQL/QueriesImpl.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony-example/symfony.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sqlc-plugin-php-dbal.iml" beforeDir="false" afterPath="$PROJECT_DIR$/sqlc-plugin-php-dbal.iml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,6 +34,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="HvAefFYj" />
   </component>
@@ -139,28 +104,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/luis.carilla/sqlc-plugin-php-dbal&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "git-widget-placeholder": "main",
+    "go.import.settings.migrated": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/luis.carilla/sqlc-plugin-php-dbal",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/symfony-example/bin" />
@@ -200,6 +170,10 @@
     <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
       <module name="sqlc-gen-kotlin" />
       <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <configuration name="PersistenceTest.test" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="PersistenceTest" file="$PROJECT_DIR$/examples/symfony-example/tests/PersistenceTest.php" method="test" scope="Method" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
@@ -252,6 +226,11 @@
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="PHPUnit.PersistenceTest.test" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -271,12 +250,34 @@
       <workItem from="1742498465807" duration="3107000" />
       <workItem from="1742501589844" duration="1068000" />
       <workItem from="1742502666212" duration="32000" />
-      <workItem from="1742502705596" duration="3022000" />
+      <workItem from="1742502705596" duration="3759000" />
+      <workItem from="1742506485637" duration="1410000" />
     </task>
+    <task id="LOCAL-00001" summary="generate the model classes into seperate files">
+      <option name="closed" value="true" />
+      <created>1742506065475</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1742506065475</updated>
+    </task>
+    <task id="LOCAL-00002" summary="generate the model classes into seperate files">
+      <option name="closed" value="true" />
+      <created>1742506070552</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1742506070552</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="generate the model classes into seperate files" />
+    <option name="LAST_COMMIT_MESSAGE" value="generate the model classes into seperate files" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

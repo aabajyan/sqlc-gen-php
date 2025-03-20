@@ -91,7 +91,7 @@ func dbalRowMapping(t phpType, name string) string {
 func (v QueryValue) ResultSet() string {
 	var out []string
 	for _, f := range v.Struct.Fields {
-		out = append(out, dbalRowMapping(f.Type, f.Name))
+		out = append(out, dbalRowMapping(f.Type, f.OriginalColumnName))
 	}
 	ret := indent(strings.Join(out, ",\n"), 4, -1)
 	return ret
@@ -130,9 +130,10 @@ func BuildDataClasses(req *plugin.GenerateRequest) []ModelClass {
 			}
 			for _, column := range table.Columns {
 				s.Fields = append(s.Fields, Field{
-					Name:    memberName(column.Name),
-					Type:    makePhpTypeFromSqlcColumn(req, column),
-					Comment: column.Comment,
+					OriginalColumnName: column.Name,
+					Name:               memberName(column.Name),
+					Type:               makePhpTypeFromSqlcColumn(req, column),
+					Comment:            column.Comment,
 				})
 			}
 			structs = append(structs, s)
@@ -184,9 +185,10 @@ func phpColumnsToStruct(req *plugin.GenerateRequest, name string, columns []goCo
 			fieldName = fmt.Sprintf("%s_%d", fieldName, v+1)
 		}
 		field := Field{
-			ID:   c.id,
-			Name: fieldName,
-			Type: makePhpTypeFromSqlcColumn(req, c.Column),
+			OriginalColumnName: c.Column.Name,
+			ID:                 c.id,
+			Name:               fieldName,
+			Type:               makePhpTypeFromSqlcColumn(req, c.Column),
 		}
 		gs.Fields = append(gs.Fields, field)
 		nameSeen[c.Name]++
