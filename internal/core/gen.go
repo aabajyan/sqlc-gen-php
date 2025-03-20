@@ -18,11 +18,11 @@ func dbalParameter(name string) string {
 }
 
 type Params struct {
-	Struct *Struct
+	ModelClass *ModelClass
 }
 
 func (v Params) isEmpty() bool {
-	return len(v.Struct.Fields) == 0
+	return len(v.ModelClass.Fields) == 0
 }
 
 func (v Params) Args() string {
@@ -30,7 +30,7 @@ func (v Params) Args() string {
 		return ""
 	}
 	var out []string
-	fields := v.Struct.Fields
+	fields := v.ModelClass.Fields
 	for _, f := range fields {
 		out = append(out, f.Type.String()+" $"+f.Name)
 	}
@@ -45,7 +45,7 @@ func (v Params) Bindings() string {
 		return ""
 	}
 	var out []string
-	for _, f := range v.Struct.Fields {
+	for _, f := range v.ModelClass.Fields {
 		out = append(out, dbalParameter(f.Name))
 	}
 	return indent(strings.Join(out, "\n"), 10, 0)
@@ -75,7 +75,7 @@ func (v Params) DBALTypes() string {
 		return ""
 	}
 	var out []string
-	for _, f := range v.Struct.Fields {
+	for _, f := range v.ModelClass.Fields {
 		out = append(out, dbalType(f.Type)+",")
 	}
 	return indent(strings.Join(out, "\n"), 10, 0)
@@ -109,8 +109,8 @@ func memberName(name string) string {
 	return sdk.LowerTitle(dataClassName(name))
 }
 
-func BuildDataClasses(req *plugin.GenerateRequest) []Struct {
-	var structs []Struct
+func BuildDataClasses(req *plugin.GenerateRequest) []ModelClass {
+	var structs []ModelClass
 	for _, schema := range req.Catalog.Schemas {
 		if schema.Name == "pg_catalog" || schema.Name == "information_schema" {
 			continue
@@ -123,7 +123,7 @@ func BuildDataClasses(req *plugin.GenerateRequest) []Struct {
 				tableName = schema.Name + "_" + table.Rel.Name
 			}
 			structName := dataClassName(tableName)
-			s := Struct{
+			s := ModelClass{
 				Table:   plugin.Identifier{Schema: schema.Name, Name: table.Rel.Name},
 				Name:    structName,
 				Comment: table.Comment,
@@ -169,8 +169,8 @@ type goColumn struct {
 	*plugin.Column
 }
 
-func phpColumnsToStruct(req *plugin.GenerateRequest, name string, columns []goColumn, namer func(*plugin.Column, int) string) *Struct {
-	gs := Struct{
+func phpColumnsToStruct(req *plugin.GenerateRequest, name string, columns []goColumn, namer func(*plugin.Column, int) string) *ModelClass {
+	gs := ModelClass{
 		Name: name,
 	}
 	idSeen := map[int]Field{}
@@ -209,28 +209,27 @@ func phpColumnName(c *plugin.Column, pos int) string {
 	return fmt.Sprintf("column_%d", pos+1)
 }
 
-func BuildQueries(req *plugin.GenerateRequest, structs []Struct) ([]Query, error) {
-	qs := make([]Query, 0, len(req.Queries))
+func BuildQueries(req *plugin.GenerateRequest, modelClasses []ModelClass) ([]Query, []*ModelClass, error) {
+	queries := make([]Query, 0, len(req.Queries))
+	emitModelClasses := make([]*ModelClass, 0)
+
 	for _, query := range req.Queries {
-		if query.Name == "" {
-			continue
-		}
-		if query.Cmd == "" {
+		if query.Name == "" || query.Cmd == "" {
 			continue
 		}
 		if query.Cmd == metadata.CmdCopyFrom {
-			return nil, errors.New("support for CopyFrom in PHP is not implemented")
+			return nil, nil, errors.New("support for CopyFrom in PHP is not implemented")
 		}
 
-		ql := query.Text
-		gq := Query{
+		queryString := query.Text
+		queryStruct := Query{
 			Cmd:          query.Cmd,
 			ClassName:    strings.ToUpper(query.Name[:1]) + query.Name[1:],
 			ConstantName: sdk.LowerTitle(query.Name),
 			FieldName:    sdk.LowerTitle(query.Name) + "Stmt",
 			MethodName:   sdk.LowerTitle(query.Name),
 			SourceName:   query.Filename,
-			SQL:          ql,
+			SQL:          queryString,
 			Comments:     query.Comments,
 		}
 
@@ -241,38 +240,33 @@ func BuildQueries(req *plugin.GenerateRequest, structs []Struct) ([]Query, error
 				Column: p.Column,
 			})
 		}
-		params := phpColumnsToStruct(req, gq.ClassName+"Bindings", cols, phpParamName)
-		gq.Arg = Params{
-			Struct: params,
-		}
+		params := phpColumnsToStruct(req, queryStruct.ClassName+"Bindings", cols, phpParamName)
+		queryStruct.Arg = Params{ModelClass: params}
 
 		if len(query.Columns) == 1 {
 			c := query.Columns[0]
-			gq.Ret = QueryValue{
+			queryStruct.Ret = QueryValue{
 				Name: "results",
 				Typ:  makePhpTypeFromSqlcColumn(req, c),
 			}
 		} else if len(query.Columns) > 1 {
-			var gs *Struct
-			var emit bool
+			var gs *ModelClass
 
-			for _, s := range structs {
+			for i := range modelClasses {
+				s := &modelClasses[i]
 				if len(s.Fields) != len(query.Columns) {
 					continue
 				}
 				same := true
 				for i, f := range s.Fields {
 					c := query.Columns[i]
-					sameName := f.Name == memberName(phpColumnName(c, i))
-					sameType := f.Type == makePhpTypeFromSqlcColumn(req, c)
-					sameTable := sdk.SameTableName(c.Table, &s.Table, req.Catalog.DefaultSchema)
-
-					if !sameName || !sameType || !sameTable {
+					if f.Name != memberName(phpColumnName(c, i)) || f.Type != makePhpTypeFromSqlcColumn(req, c) || !sdk.SameTableName(c.Table, &s.Table, req.Catalog.DefaultSchema) {
 						same = false
+						break
 					}
 				}
 				if same {
-					gs = &s
+					gs = s
 					break
 				}
 			}
@@ -280,23 +274,21 @@ func BuildQueries(req *plugin.GenerateRequest, structs []Struct) ([]Query, error
 			if gs == nil {
 				var columns []goColumn
 				for i, c := range query.Columns {
-					columns = append(columns, goColumn{
-						id:     i,
-						Column: c,
-					})
+					columns = append(columns, goColumn{id: i, Column: c})
 				}
-				gs = phpColumnsToStruct(req, gq.ClassName+"Row", columns, phpColumnName)
-				emit = true
+				gs = phpColumnsToStruct(req, queryStruct.ClassName+"Row", columns, phpColumnName)
+				emitModelClasses = append(emitModelClasses, gs)
 			}
-			gq.Ret = QueryValue{
-				Emit:   emit,
+
+			queryStruct.Ret = QueryValue{
 				Name:   "results",
 				Struct: gs,
 			}
 		}
 
-		qs = append(qs, gq)
+		queries = append(queries, queryStruct)
 	}
-	sort.Slice(qs, func(i, j int) bool { return qs[i].MethodName < qs[j].MethodName })
-	return qs, nil
+
+	sort.Slice(queries, func(i, j int) bool { return queries[i].MethodName < queries[j].MethodName })
+	return queries, emitModelClasses, nil
 }

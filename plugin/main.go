@@ -1,11 +1,10 @@
 package main
 
 import (
+	generator "github.com/lcarilla/sqlc-plugin-php-dbal/internal"
 	"github.com/sqlc-dev/plugin-sdk-go/codegen"
-
-	kotlin "github.com/sqlc-dev/sqlc-gen-kotlin/internal"
 )
 
 func main() {
-	codegen.Run(kotlin.Generate)
+	codegen.Run(generator.Generate)
 }

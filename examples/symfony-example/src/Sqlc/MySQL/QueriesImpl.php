@@ -3,6 +3,8 @@
 // versions:
 //   sqlc v1.28.0
 
+declare(strict_types=1);
+
 namespace App\Sqlc\MySQL;
 
 use Doctrine\DBAL\Connection;
@@ -23,18 +25,6 @@ FROM book
 WHERE tags = ?
 ";
 
-class BookByTagsRow {
- public function __construct(
-    public int $bookId,
-    public string $title,
-    public ?string $name,
-    public string $isbn,
-    public string $tags,
-    )
-{
-}
-}
-
 const bookByTagsMultiple = "-- name: bookByTagsMultiple :many
 SELECT
     book_id,
@@ -46,18 +36,6 @@ FROM book
          LEFT JOIN author ON book.author_id = author.author_id
 WHERE tags IN (/*SLICE:tags*/?)
 ";
-
-class BookByTagsMultipleRow {
- public function __construct(
-    public int $bookId,
-    public string $title,
-    public ?string $name,
-    public string $isbn,
-    public string $tags,
-    )
-{
-}
-}
 
 const bookByTitleYear = "-- name: bookByTitleYear :many
 SELECT book_id, author_id, isbn, book_type, title, yr, available, tags FROM book
@@ -120,21 +98,19 @@ SET title = ?, tags = ?, isbn = ?
 WHERE book_id = ?
 ";
 
-class QueriesImpl implements Queries {
-    public function __construct(private Connection $connection)
-    {
-    }
+final readonly class QueriesImpl implements Queries {
+    public function __construct(private Connection $connection) {}
 
     /**
-    * @throws Exception
-    */
+     * @throws Exception
+     */
     public function bookByTags(string $tags): array
     {
         $params = [
-        $tags,
+            $tags,
         ];
         $types = [
-        ParameterType::STRING,
+            ParameterType::STRING,
         ];
         $query = $this->connection->executeQuery(bookByTags, $params, $types);
         $results = $query->fetchAllAssociative();
@@ -153,15 +129,15 @@ class QueriesImpl implements Queries {
     }
 
     /**
-    * @throws Exception
-    */
+     * @throws Exception
+     */
     public function bookByTagsMultiple(array $tags): array
     {
         $params = [
-        $tags,
+            $tags,
         ];
         $types = [
-        ArrayParameterType::STRING,
+            ArrayParameterType::STRING,
         ];
         $query = $this->connection->executeQuery(bookByTagsMultiple, $params, $types);
         $results = $query->fetchAllAssociative();
@@ -180,16 +156,16 @@ class QueriesImpl implements Queries {
     }
 
     /**
-    * @throws Exception
-    */
+     * @throws Exception
+     */
     public function bookByTitleYear(string $uuidToBin, int $yr): array
     {
         $params = [
-        $uuidToBin,
+            $uuidToBin,
           $yr,
         ];
         $types = [
-        ParameterType::STRING,
+            ParameterType::STRING,
           ParameterType::INTEGER,
         ];
         $query = $this->connection->executeQuery(bookByTitleYear, $params, $types);
@@ -211,7 +187,7 @@ class QueriesImpl implements Queries {
           return $ret;
     }
 
-  /**
+    /**
     * @throws Exception
     */
     public function createAuthor(string $name): int {
@@ -219,14 +195,14 @@ class QueriesImpl implements Queries {
             $name,
         ];
         $types = [
-        ParameterType::STRING,
+            ParameterType::STRING,
         ];
         $this->connection->executeQuery(createAuthor, $params, $types);
 
         return $this->connection->lastInsertId();
       }
 
-  /**
+    /**
     * @throws Exception
     */
     public function createBook(
@@ -247,7 +223,7 @@ class QueriesImpl implements Queries {
           $tags,
         ];
         $types = [
-        ParameterType::INTEGER,
+            ParameterType::INTEGER,
           ParameterType::STRING,
           ParameterType::STRING,
           ParameterType::STRING,
@@ -260,32 +236,32 @@ class QueriesImpl implements Queries {
         return $this->connection->lastInsertId();
       }
 
-  /**
+    /**
     * @throws Exception
     */
     public function deleteAuthorBeforeYear(int $yr, int $authorId): void
     {
         $params = [
-        $yr,
+            $yr,
           $authorId,
         ];
         $types = [
-        ParameterType::INTEGER,
+            ParameterType::INTEGER,
           ParameterType::INTEGER,
         ];
         $this->connection->executeQuery(deleteAuthorBeforeYear, $params, $types);
       }
 
-  /**
+    /**
     * @throws Exception
     */
     public function deleteBook(int $bookId): void
     {
         $params = [
-        $bookId,
+            $bookId,
         ];
         $types = [
-        ParameterType::INTEGER,
+            ParameterType::INTEGER,
         ];
         $this->connection->executeQuery(deleteBook, $params, $types);
       }
@@ -294,18 +270,18 @@ class QueriesImpl implements Queries {
      * @throws Exception
      */
     public function getAuthor(int $authorId): ?Author
-   {
+    {
         $params = [
-        $authorId,
+            $authorId,
         ];
         $types = [
-        ParameterType::INTEGER,
+            ParameterType::INTEGER,
         ];
         $query = $this->connection->executeQuery(getAuthor, $params, $types);
         $results = $query->fetchAllAssociative();
         /**
-        *  @var $ret array<Author>
-        */
+         *  @var $ret array<Author>
+         */
         $ret = [];
         if(count($results) != 1){
             throw new \Exception("NOT 1 ROW RETURNED");
@@ -322,18 +298,18 @@ class QueriesImpl implements Queries {
      * @throws Exception
      */
     public function getBook(int $bookId): ?Book
-   {
+    {
         $params = [
-        $bookId,
+            $bookId,
         ];
         $types = [
-        ParameterType::INTEGER,
+            ParameterType::INTEGER,
         ];
         $query = $this->connection->executeQuery(getBook, $params, $types);
         $results = $query->fetchAllAssociative();
         /**
-        *  @var $ret array<Book>
-        */
+         *  @var $ret array<Book>
+         */
         $ret = [];
         if(count($results) != 1){
             throw new \Exception("NOT 1 ROW RETURNED");
@@ -352,7 +328,7 @@ class QueriesImpl implements Queries {
         return $ret[0];
   }
 
-  /**
+    /**
     * @throws Exception
     */
     public function updateBook(
@@ -361,19 +337,19 @@ class QueriesImpl implements Queries {
       int $bookId): void
     {
         $params = [
-        $title,
+            $title,
           $tags,
           $bookId,
         ];
         $types = [
-        ParameterType::STRING,
+            ParameterType::STRING,
           ParameterType::STRING,
           ParameterType::INTEGER,
         ];
         $this->connection->executeQuery(updateBook, $params, $types);
       }
 
-  /**
+    /**
     * @throws Exception
     */
     public function updateBookISBN(
@@ -383,13 +359,13 @@ class QueriesImpl implements Queries {
       int $bookId): void
     {
         $params = [
-        $title,
+            $title,
           $tags,
           $isbn,
           $bookId,
         ];
         $types = [
-        ParameterType::STRING,
+            ParameterType::STRING,
           ParameterType::STRING,
           ParameterType::STRING,
           ParameterType::INTEGER,

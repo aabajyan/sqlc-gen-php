@@ -1,4 +1,4 @@
-package kotlin
+package generator
 
 import (
 	"bufio"
@@ -10,9 +10,9 @@ import (
 	_ "strings"
 	"text/template"
 
+	"github.com/lcarilla/sqlc-plugin-php-dbal/internal/core"
 	"github.com/sqlc-dev/plugin-sdk-go/plugin"
 	"github.com/sqlc-dev/plugin-sdk-go/sdk"
-	"github.com/sqlc-dev/sqlc-gen-kotlin/internal/core"
 )
 
 //go:embed tmpl/models.tmpl
@@ -43,7 +43,20 @@ func RemoveBlankLines(s string) string {
 	return o
 }
 
-func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.GenerateResponse, error) {
+func executeTemplate(name string, t *template.Template, ctx interface{}, output map[string]string) error {
+	var b bytes.Buffer
+	w := bufio.NewWriter(&b)
+	if err := t.Execute(w, ctx); err != nil {
+		return err
+	}
+	if err := w.Flush(); err != nil {
+		return err
+	}
+	output[name] = RemoveBlankLines(b.String())
+	return nil
+}
+
+func Generate(_ context.Context, req *plugin.GenerateRequest) (*plugin.GenerateResponse, error) {
 	var conf core.Config
 	if len(req.PluginOptions) > 0 {
 		if err := json.Unmarshal(req.PluginOptions, &conf); err != nil {
@@ -51,8 +64,8 @@ func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.Generat
 		}
 	}
 
-	structs := core.BuildDataClasses(req)
-	queries, err := core.BuildQueries(req, structs)
+	modelClasses := core.BuildDataClasses(req)
+	queries, emitModelClasses, err := core.BuildQueries(req, modelClasses)
 	if err != nil {
 		return nil, err
 	}
@@ -67,44 +80,44 @@ func Generate(ctx context.Context, req *plugin.GenerateRequest) (*plugin.Generat
 	sqlFile := template.Must(template.New("table").Funcs(funcMap).Parse(queryImplTemplate))
 	ifaceFile := template.Must(template.New("table").Funcs(funcMap).Parse(queryInterfaceTemplate))
 
-	tctx := core.PhpTmplCtx{
+	queryTemplateContext := core.QueriesTmplCtx{
 		Settings:    req.Settings,
 		Package:     conf.Package,
 		Queries:     queries,
-		DataClasses: structs,
 		SqlcVersion: req.SqlcVersion,
 	}
 
 	output := map[string]string{}
 
-	execute := func(name string, t *template.Template) error {
-		tctx.SourceName = name
-		var b bytes.Buffer
-		w := bufio.NewWriter(&b)
-		err := t.Execute(w, tctx)
-		if err != nil {
-			return err
-		}
-		err = w.Flush()
-		if err != nil {
-			return err
-		}
-		output[name] = RemoveBlankLines(b.String())
-		return nil
+	if err := executeTemplate("Queries.php", ifaceFile, queryTemplateContext, output); err != nil {
+		return nil, err
+	}
+	if err := executeTemplate("QueriesImpl.php", sqlFile, queryTemplateContext, output); err != nil {
+		return nil, err
 	}
 
-	if err := execute("Models.php", modelsFile); err != nil {
-		return nil, err
+	for i := range modelClasses {
+		modelClass := &modelClasses[i]
+		if err := executeTemplate(modelClass.Name+".php", modelsFile, &core.ModelsTmplCtx{
+			Package:     conf.Package,
+			SqlcVersion: req.SqlcVersion,
+			ModelClass:  modelClass,
+		}, output); err != nil {
+			return nil, err
+		}
 	}
-	if err := execute("Queries.php", ifaceFile); err != nil {
-		return nil, err
-	}
-	if err := execute("QueriesImpl.php", sqlFile); err != nil {
-		return nil, err
+
+	for _, modelClass := range emitModelClasses {
+		if err := executeTemplate(modelClass.Name+".php", modelsFile, &core.ModelsTmplCtx{
+			Package:     conf.Package,
+			SqlcVersion: req.SqlcVersion,
+			ModelClass:  modelClass,
+		}, output); err != nil {
+			return nil, err
+		}
 	}
 
 	resp := plugin.GenerateResponse{}
-
 	for filename, code := range output {
 		resp.Files = append(resp.Files, &plugin.File{
 			Name:     filename,

@@ -3,6 +3,8 @@
 // versions:
 //   sqlc v1.28.0
 
+declare(strict_types=1);
+
 namespace App\Sqlc\MySQL;
 
 interface Queries {

@@ -2,7 +2,7 @@ version: '2'
 plugins:
 - name: php
   wasm:
-    url: https://dev-sqlc-kredite.wrapped.check24-test.de/sqlc-gen-kotlin.wasm
+    url: file:///Users/luis.carilla/sqlc-plugin-php-dbal/bin/sqlc-gen-kotlin.wasm
 sql:
 - schema: sqlc/authors/mysql/schema.sql
   queries: sqlc/authors/mysql/query.sql

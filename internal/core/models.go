@@ -22,7 +22,7 @@ type Field struct {
 	Comment string
 }
 
-type Struct struct {
+type ModelClass struct {
 	Table   plugin.Identifier
 	Name    string
 	Fields  []Field
@@ -30,14 +30,9 @@ type Struct struct {
 }
 
 type QueryValue struct {
-	Emit   bool
 	Name   string
-	Struct *Struct
+	Struct *ModelClass
 	Typ    phpType
-}
-
-func (v QueryValue) EmitStruct() bool {
-	return v.Emit
 }
 
 func (v QueryValue) IsStruct() bool {
@@ -58,16 +53,19 @@ func (v QueryValue) Type() string {
 	panic("no type for QueryValue: " + v.Name)
 }
 
-type PhpTmplCtx struct {
-	Package             string
-	DataClasses         []Struct
-	Queries             []Query
-	Settings            *plugin.Settings
-	SqlcVersion         string
-	SourceName          string
-	EmitJSONTags        bool
-	EmitPreparedQueries bool
-	EmitInterface       bool
+type QueriesTmplCtx struct {
+	Package     string
+	Queries     []Query
+	Settings    *plugin.Settings
+	SqlcVersion string
+	SourceName  string
+}
+
+type ModelsTmplCtx struct {
+	Package     string
+	ModelClass  *ModelClass
+	SqlcVersion string
+	SourceName  string
 }
 
 type phpType struct {

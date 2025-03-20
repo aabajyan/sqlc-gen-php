@@ -3,6 +3,8 @@
 // versions:
 //   sqlc {{.SqlcVersion}}
 
+declare(strict_types=1);
+
 namespace {{.Package}};
 
 use Doctrine\DBAL\Connection;
@@ -16,44 +18,31 @@ use Doctrine\DBAL\ParameterType;
 const {{.ConstantName}} = "-- name: {{.MethodName}} {{.Cmd}}
 {{.SQL}}
 ";
-
-{{if .Ret.EmitStruct}}
-class {{.Ret.Type}} {
- public function __construct(
- {{- range $i, $e := .Ret.Struct.Fields}}
-    public {{.Type}} ${{.Name}},
-  {{- end}}
-    )
-{
-}
-}
-{{end}}
 {{end}}
 
-class QueriesImpl implements Queries {
-    public function __construct(private Connection $connection)
-    {
-    }
-{{range .Queries}}
-{{if eq .Cmd ":one"}}
-{{range .Comments}}//{{.}}
-{{end}}
+final readonly class QueriesImpl implements Queries {
+    public function __construct(private Connection $connection) {}
+
+    {{range .Queries}}
+    {{if eq .Cmd ":one"}}
+    {{range .Comments}}//{{.}}
+    {{end}}
     /**
      * @throws Exception
      */
     public function {{.MethodName}}({{.Arg.Args}}): ?{{.Ret.Type}}
-   {
+    {
         $params = [
-        {{ .Arg.Bindings }}
+            {{ .Arg.Bindings }}
         ];
         $types = [
-        {{ .Arg.DBALTypes }}
+            {{ .Arg.DBALTypes }}
         ];
         $query = $this->connection->executeQuery({{.ConstantName}}, $params, $types);
         $results = $query->fetchAllAssociative();
         /**
-        *  @var $ret array<{{.Ret.Type}}>
-        */
+         *  @var $ret array<{{.Ret.Type}}>
+         */
         $ret = [];
         if(count($results) != 1){
             throw new \Exception("NOT 1 ROW RETURNED");
@@ -70,15 +59,15 @@ class QueriesImpl implements Queries {
 {{range .Comments}}//{{.}}
 {{end}}
     /**
-    * @throws Exception
-    */
+     * @throws Exception
+     */
     public function {{.MethodName}}({{.Arg.Args}}): array
     {
         $params = [
-        {{ .Arg.Bindings }}
+            {{ .Arg.Bindings }}
         ];
         $types = [
-        {{ .Arg.DBALTypes }}
+            {{ .Arg.DBALTypes }}
         ];
         $query = $this->connection->executeQuery({{.ConstantName}}, $params, $types);
         $results = $query->fetchAllAssociative();
@@ -96,17 +85,16 @@ class QueriesImpl implements Queries {
 {{if eq .Cmd ":exec"}}
 {{range .Comments}}//{{.}}
 {{end}}
-  {{ if $.EmitInterface }}override {{ end -}}
     /**
     * @throws Exception
     */
     public function {{.MethodName}}({{.Arg.Args}}): void
     {
         $params = [
-        {{ .Arg.Bindings }}
+            {{ .Arg.Bindings }}
         ];
         $types = [
-        {{ .Arg.DBALTypes }}
+            {{ .Arg.DBALTypes }}
         ];
         $this->connection->executeQuery({{.ConstantName}}, $params, $types);
       }
@@ -115,7 +103,6 @@ class QueriesImpl implements Queries {
 {{if eq .Cmd ":execrows"}}
 {{range .Comments}}//{{.}}
 {{end}}
-  {{ if $.EmitInterface }}override {{ end -}}
     /**
     * @throws Exception
     */
@@ -125,7 +112,7 @@ class QueriesImpl implements Queries {
             {{ .Arg.Bindings }}
         ];
         $types = [
-        {{ .Arg.DBALTypes }}
+            {{ .Arg.DBALTypes }}
         ];
         $this->connection->executeQuery({{.ConstantName}}, $params, $types);
 
@@ -136,7 +123,6 @@ class QueriesImpl implements Queries {
 {{if eq .Cmd ":execresult"}}
 {{range .Comments}}//{{.}}
 {{end}}
-  {{ if $.EmitInterface }}override {{ end -}}
     /**
     * @throws Exception
     */
@@ -145,7 +131,7 @@ class QueriesImpl implements Queries {
             {{ .Arg.Bindings }}
         ];
         $types = [
-        {{ .Arg.DBALTypes }}
+            {{ .Arg.DBALTypes }}
         ];
         $this->connection->executeQuery({{.ConstantName}}, $params, $types);
 

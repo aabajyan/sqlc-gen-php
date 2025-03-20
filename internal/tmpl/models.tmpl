@@ -3,20 +3,19 @@
 // versions:
 //   sqlc {{.SqlcVersion}}
 
+declare(strict_types=1);
+
 namespace {{.Package}};
 
-{{range .DataClasses}}
-{{if .Comment}}{{comment .Comment}}{{end}}
-class {{.Name}} {
-  public function __construct(
-  {{- range $i, $e := .Fields}}
-  {{- if .Comment}}
-  {{comment .Comment}}{{else}}
-  {{- end}}
-  public {{.Type}} ${{.Name}},
-    {{- end}}
+{{if .ModelClass.Comment}}{{comment .ModelClass.Comment}}{{end}}
+final readonly class {{.ModelClass.Name}} {
+    public function __construct(
+        {{- range $i, $e := .ModelClass.Fields}}
+        {{- if .Comment}}
+        {{comment .Comment}}{{else}}
+        {{- end}}
+        public {{.Type}} ${{.Name}},
+        {{- end}}
     )
-    {
-    }
+    {}
 }
-{{end}}
