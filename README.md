@@ -7,7 +7,7 @@ plugins:
 - name: php
   wasm:
     url: https://github.com/lcarilla/sqlc-plugin-php-dbal/releases/download/v0.0.2/sqlc-gen-php.wasm
-    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    sha256: 74f7a968592aeb6171113ad0cb972b7da9739c33f26738fbd6b2eee8893ce157
 sql:
 - schema: sqlc/authors/mysql/schema.sql
   queries: sqlc/authors/mysql/query.sql
