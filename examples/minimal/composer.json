@@ -1,0 +1,17 @@
+{
+    "name": "aabajyan/minimal",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "aabajyan"
+        }
+    ],
+    "require-dev": {
+        "symfony/var-dumper": "^7.3"
+    }
+}

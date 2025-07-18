@@ -7,11 +7,7 @@ declare(strict_types=1);
 
 namespace {{.Package}};
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\ParameterType;
+
 
 
 {{range .Queries}}
@@ -21,27 +17,23 @@ const {{.ConstantName}} = "-- name: {{.MethodName}} {{.Cmd}}
 {{end}}
 
 final readonly class QueriesImpl implements Queries {
-    public function __construct(private Connection $connection) {}
+    public function __construct(private \PDO $pdo) {}
 
     {{range .Queries}}
     {{if eq .Cmd ":one"}}
     {{range .Comments}}//{{.}}
     {{end}}
     /**
-     * @throws Exception
+     * @return {{.Ret.Type}}|null
+     * @throws \Exception
      */
     public function {{.MethodName}}({{.Arg.Args}}): ?{{.Ret.Type}}
     {
-        $params = [
-            {{ .Arg.Bindings }}
-        ];
-        $types = [
-            {{ .Arg.DBALTypes }}
-        ];
-        $query = $this->connection->executeQuery({{.ConstantName}}, $params, $types);
-        $results = $query->fetchAllAssociative();
+        $stmt = $this->pdo->prepare({{.ConstantName}});
+        $stmt->execute([{{ .Arg.Bindings }}]);
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         /**
-         *  @var $ret array<{{.Ret.Type}}>
+         * @var {{.Ret.Type}}[]
          */
         $ret = [];
         if(count($results) != 1){
@@ -50,35 +42,30 @@ final readonly class QueriesImpl implements Queries {
         foreach ($results as $row) {
             $ret[] = new {{.Ret.Type}}({{.Ret.ResultSet}});
         }
-
         return $ret[0];
-  }
+    }
 {{end}}
 
 {{if eq .Cmd ":many"}}
 {{range .Comments}}//{{.}}
 {{end}}
     /**
-     * @throws Exception
+     * @return {{.Ret.Type}}[]
+     * @throws \Exception
      */
     public function {{.MethodName}}({{.Arg.Args}}): array
     {
-        $params = [
-            {{ .Arg.Bindings }}
-        ];
-        $types = [
-            {{ .Arg.DBALTypes }}
-        ];
-        $query = $this->connection->executeQuery({{.ConstantName}}, $params, $types);
-        $results = $query->fetchAllAssociative();
+        $stmt = $this->pdo->prepare({{.ConstantName}});
+        $stmt->execute([{{ .Arg.Bindings }}]);
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         /**
-        *  @var $ret array<{{.Ret.Type}}>
-        */
-          $ret = [];
-          foreach ($results as $row) {
-              $ret[] = new {{.Ret.Type}}({{.Ret.ResultSet}});
-          }
-          return $ret;
+         * @var {{.Ret.Type}}[]
+         */
+        $ret = [];
+        foreach ($results as $row) {
+            $ret[] = new {{.Ret.Type}}({{.Ret.ResultSet}});
+        }
+        return $ret;
     }
 {{end}}
 
@@ -86,37 +73,26 @@ final readonly class QueriesImpl implements Queries {
 {{range .Comments}}//{{.}}
 {{end}}
     /**
-    * @throws Exception
-    */
+     * @throws \Exception
+     */
     public function {{.MethodName}}({{.Arg.Args}}): void
     {
-        $params = [
-            {{ .Arg.Bindings }}
-        ];
-        $types = [
-            {{ .Arg.DBALTypes }}
-        ];
-        $this->connection->executeQuery({{.ConstantName}}, $params, $types);
-      }
+        $stmt = $this->pdo->prepare({{.ConstantName}});
+        $stmt->execute([{{ .Arg.Bindings }}]);
+    }
 {{end}}
 
 {{if eq .Cmd ":execrows"}}
 {{range .Comments}}//{{.}}
 {{end}}
     /**
-    * @throws Exception
-    */
+     * @throws \Exception
+     */
     public function {{.MethodName}}({{.Arg.Args}}): int|string
     {
-        $params = [
-            {{ .Arg.Bindings }}
-        ];
-        $types = [
-            {{ .Arg.DBALTypes }}
-        ];
-        $this->connection->executeQuery({{.ConstantName}}, $params, $types);
-
-        return $this->connection->lastInsertId();
+        $stmt = $this->pdo->prepare({{.ConstantName}});
+        $stmt->execute([{{ .Arg.Bindings }}]);
+        return $this->pdo->lastInsertId();
     }
 {{end}}
 
@@ -124,19 +100,13 @@ final readonly class QueriesImpl implements Queries {
 {{range .Comments}}//{{.}}
 {{end}}
     /**
-    * @throws Exception
-    */
+     * @throws \Exception
+     */
     public function {{.MethodName}}({{.Arg.Args}}): int|string {
-        $params = [
-            {{ .Arg.Bindings }}
-        ];
-        $types = [
-            {{ .Arg.DBALTypes }}
-        ];
-        $this->connection->executeQuery({{.ConstantName}}, $params, $types);
-
-        return $this->connection->lastInsertId();
-      }
+        $stmt = $this->pdo->prepare({{.ConstantName}});
+        $stmt->execute([{{ .Arg.Bindings }}]);
+        return $this->pdo->lastInsertId();
+    }
 {{end}}
 {{end}}
 }

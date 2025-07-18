@@ -40,17 +40,15 @@ func (v QueryValue) IsStruct() bool {
 	return v.Struct != nil
 }
 
-func (v QueryValue) isEmpty() bool {
-	return v.Typ == (phpType{}) && v.Name == "" && v.Struct == nil
-}
-
 func (v QueryValue) Type() string {
 	if v.Typ != (phpType{}) {
 		return v.Typ.String()
 	}
+
 	if v.Struct != nil {
 		return v.Struct.Name
 	}
+
 	panic("no type for QueryValue: " + v.Name)
 }
 
@@ -84,6 +82,7 @@ func (t phpType) String() string {
 	} else if t.IsNull {
 		v = "?" + v
 	}
+
 	return v
 }
 

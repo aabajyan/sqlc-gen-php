@@ -1,13 +1,12 @@
-# SQLC PHP DBAL Plugin
+# SQLC PHP PDO Plugin (Fork)
 
-A SQLC plugin that generates PHP code using Doctrine DBAL for type-safe database operations. This plugin allows you to write SQL queries and automatically generates PHP classes with proper type hints and database abstraction.
+A fork of the original SQLC plugin, this version generates PHP code using native PDO for type-safe database operations. It allows you to write SQL queries and automatically generates PHP classes with proper type hints and database abstraction, without requiring Doctrine DBAL.
 
 ## Features
 
-- Generates PHP classes from SQL queries using Doctrine DBAL
-- Supports MySQL (PostgreSQL support in development)
+- Generates PHP classes from SQL queries using native PDO
+- Supports MySQL and SQLite
 - Type-safe database operations
-- Integration with Symfony framework
 - Support for various SQL operations:
   - SELECT queries (single and multiple results)
   - INSERT operations
@@ -19,7 +18,7 @@ A SQLC plugin that generates PHP code using Doctrine DBAL for type-safe database
 
 ## Installation
 
-1. Download the latest release from the [releases page](https://github.com/lcarilla/sqlc-plugin-php-dbal/releases)
+1. Download the latest release from the [releases page](https://github.com/aabajyan/sqlc-gen-php/releases) of this fork
 2. Add the plugin to your `sqlc.yaml` configuration:
 
 ```yaml
@@ -27,8 +26,8 @@ version: '2'
 plugins:
 - name: php
   wasm:
-    url: https://github.com/lcarilla/sqlc-plugin-php-dbal/releases/download/v0.0.2/sqlc-gen-php.wasm
-    sha256: 74f7a968592aeb6171113ad0cb972b7da9739c33f26738fbd6b2eee8893ce157
+  url: https://github.com/aabajyan/sqlc-gen-php/releases/download/v0.0.2/sqlc-gen-php.wasm
+  sha256: <update-with-correct-sha256>
 ```
 
 ## Configuration
@@ -39,15 +38,16 @@ Configure your SQL queries in `sqlc.yaml`:
 sql:
 - schema: sqlc/authors/mysql/schema.sql
   queries: sqlc/authors/mysql/query.sql
-  engine: mysql
+  engine: mysql # or sqlite
   codegen:
     - out: src/Sqlc/MySQL
       plugin: php
       options:
-        package: "App\\Sqlc\\MySQL"
+        package: "App\\Sqlc\\MySQL" # or your preferred namespace
 ```
 
-Exmaple of a complete `sqlc.yaml` config:
+Example of a complete `sqlc.yaml` config:
+
 ```yaml
 version: '2'
 plugins:
@@ -58,12 +58,12 @@ plugins:
 sql:
 - schema: sqlc/authors/mysql/schema.sql
   queries: sqlc/authors/mysql/query.sql
-  engine: mysql
+  engine: mysql # or sqlite
   codegen:
     - out: src/Sqlc/MySQL
-      plugin: php
+  plugin: php
       options:
-        package: "App\\Sqlc\\MySQL"
+  package: "App\\Sqlc\\MySQL" # or your preferred namespace
 ```
 
 ### Options
@@ -92,17 +92,19 @@ WHERE author_id = ?;
 
 ### Generated PHP Code
 
-The plugin will generate PHP classes for the Models and Queries that you can use in your application:
+The plugin will generate PHP classes for the Models and Queries that you can use in your application. Usage with PDO:
 
 ```php
 use App\Sqlc\MySQL\QueriesImpl;
 
-$author = new QueriesImpl($connection)->getAuthor(authorId: 1);
+$pdo = new PDO($dsn, $user, $password);
+$author = (new QueriesImpl($pdo))->getAuthor(authorId: 1);
 ```
 
 ## Development Status
 
 - ✅ MySQL support
+- ✅ SQLite support
 - 🚧 PostgreSQL support (Work in Progress)
 - ✅ Basic CRUD operations
 - ✅ Complex queries with joins

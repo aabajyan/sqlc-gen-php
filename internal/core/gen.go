@@ -3,19 +3,16 @@ package core
 import (
 	"errors"
 	"fmt"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"sort"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/sqlc-dev/plugin-sdk-go/metadata"
 	"github.com/sqlc-dev/plugin-sdk-go/plugin"
 	"github.com/sqlc-dev/plugin-sdk-go/sdk"
 )
-
-func dbalParameter(name string) string {
-	return fmt.Sprintf("$%s,", name)
-}
 
 type Params struct {
 	ModelClass *ModelClass
@@ -46,42 +43,12 @@ func (v Params) Bindings() string {
 	}
 	var out []string
 	for _, f := range v.ModelClass.Fields {
-		out = append(out, dbalParameter(f.Name))
+		out = append(out, fmt.Sprintf("$%s", f.Name))
 	}
-	return indent(strings.Join(out, "\n"), 10, 0)
+	return indent(strings.Join(out, ",\n"), 10, 0)
 }
 
-func dbalType(t phpType) string {
-	if t.IsInt() {
-		if t.IsArray {
-			return "ArrayParameterType::INTEGER"
-		}
-		return "ParameterType::INTEGER"
-	}
-	if t.IsDateTimeImmutable() {
-		return "Types::DATE_IMMUTABLE"
-	}
-	if t.IsString() {
-		if t.IsArray {
-			return "ArrayParameterType::STRING"
-		}
-		return "ParameterType::STRING"
-	}
-	return "ParameterType::STRING"
-}
-
-func (v Params) DBALTypes() string {
-	if v.isEmpty() {
-		return ""
-	}
-	var out []string
-	for _, f := range v.ModelClass.Fields {
-		out = append(out, dbalType(f.Type)+",")
-	}
-	return indent(strings.Join(out, "\n"), 10, 0)
-}
-
-func dbalRowMapping(t phpType, name string) string {
+func pdoRowMapping(t phpType, name string) string {
 	if t.IsDateTimeImmutable() {
 		return fmt.Sprintf(`$row["%s"] == null ? null : new \DateTimeImmutable($row["%s"])`, name, name)
 	}
@@ -91,7 +58,7 @@ func dbalRowMapping(t phpType, name string) string {
 func (v QueryValue) ResultSet() string {
 	var out []string
 	for _, f := range v.Struct.Fields {
-		out = append(out, dbalRowMapping(f.Type, f.OriginalColumnName))
+		out = append(out, pdoRowMapping(f.Type, f.OriginalColumnName))
 	}
 	ret := indent(strings.Join(out, ",\n"), 4, -1)
 	return ret
@@ -158,6 +125,8 @@ func makePhpTypeFromSqlcColumn(req *plugin.GenerateRequest, col *plugin.Column) 
 
 func mapSqlColumnTypeToPhpType(req *plugin.GenerateRequest, col *plugin.Column) string {
 	switch req.Settings.Engine {
+	case "sqlite":
+		return sqliteType(col)
 	case "mysql":
 		return mysqlType(col)
 	default:
