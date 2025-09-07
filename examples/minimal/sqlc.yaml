@@ -2,7 +2,7 @@ version: "2"
 plugins:
   - name: php
     wasm:
-      url: https://github.com/aabajyan/sqlc-gen-php/releases/download/v0.0.2/sqlc-gen-php.wasm
+      url: https://github.com/aabajyan/sqlc-gen-php/releases/download/v0.0.3/sqlc-gen-php.wasm
       sha256: c54aebed19d5c7961127821c0bac84c8bb00e39d8a0eca05b1710b438e17cbe2
 sql:
   - schema: sqlc/mysql/schema.sql
