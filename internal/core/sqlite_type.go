@@ -26,7 +26,7 @@ func sqliteType(col *plugin.Column) string {
 	case "numeric":
 		return "string"
 	case "json":
-		return "string"
+		return "array"
 	case "any":
 		return "mixed"
 	default:
