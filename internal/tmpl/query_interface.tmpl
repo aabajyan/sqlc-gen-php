@@ -15,7 +15,7 @@ interface Queries {
   {{- end}}
   {{- if eq .Cmd ":many"}}
   /**
-  *  @return array<{{.Ret.Type}}>
+  *  @return {{.Ret.Type}}[]
   */
   public function {{.MethodName}}({{.Arg.Args}}): array;
   {{- end}}

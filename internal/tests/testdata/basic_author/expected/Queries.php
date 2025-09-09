@@ -12,7 +12,7 @@ interface Queries {
   public function getAuthor(int $authorId): ?Author;
   
   /**
-  *  @return array<Author>
+  *  @return Author[]
   */
   public function listAuthors(): array;
   
