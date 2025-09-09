@@ -8,6 +8,9 @@ build:
 test:
 	go test ./...
 
+update_tests:
+	go test -v ./internal/tests -update
+
 bin/sqlc-gen-php.wasm:
 	GOOS=wasip1 GOARCH=wasm go build -o ./bin/sqlc-gen-php.wasm ./plugin/main.go
 
