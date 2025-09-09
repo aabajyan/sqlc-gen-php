@@ -67,7 +67,7 @@ func (v QueryValue) ResultSet() string {
 		out = append(out, pdoRowMapping(f.Type, f.OriginalColumnName))
 	}
 
-	ret := indent(strings.Join(out, ",\n"), 4, -1)
+	ret := strings.Join(out, ", ")
 	return ret
 }
 
