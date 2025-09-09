@@ -64,7 +64,7 @@ final readonly class QueriesImpl implements Queries {
             throw new \Exception("NOT 1 ROW RETURNED");
         }
         foreach ($results as $row) {
-            $ret[] = new Author($row["author_id"], json_decode($row["data"], true));
+            $ret[] = new Author($row["author_id"], json_decode($row["data"], true) ?? []);
         }
         return $ret[0];
     }
@@ -83,7 +83,7 @@ final readonly class QueriesImpl implements Queries {
          */
         $ret = [];
         foreach ($results as $row) {
-            $ret[] = new Author($row["author_id"], json_decode($row["data"], true));
+            $ret[] = new Author($row["author_id"], json_decode($row["data"], true) ?? []);
         }
         return $ret;
     }

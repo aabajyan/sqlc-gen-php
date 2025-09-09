@@ -64,7 +64,7 @@ func pdoRowMapping(t phpType, name string) string {
 	}
 
 	if t.IsJSON() {
-		return fmt.Sprintf(`json_decode($row["%s"], true)`, name)
+		return fmt.Sprintf(`json_decode($row["%s"], true) ?? []`, name)
 	}
 
 	return fmt.Sprintf(`$row["%s"]`, name)
