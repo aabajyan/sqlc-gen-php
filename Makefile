@@ -20,6 +20,7 @@ sqlc.yaml: bin/sqlc-gen-php.wasm
 	sha256sum bin/sqlc-gen-php.wasm | awk '{print $$1}' | xargs -I {} sed -i 's/sha256: .*/sha256: {}/' sqlc.yaml
 	sed -i "s|url: .*|url: file://$(PWD)/bin/sqlc-gen-php.wasm|" sqlc.yaml
 	sed -i "s|sqlc/|examples/minimal/sqlc/|g" sqlc.yaml
+	sed -i "s|src/Sqlc|examples/minimal/src/Sqlc|g" sqlc.yaml
 
 generate: sqlc.yaml
 
