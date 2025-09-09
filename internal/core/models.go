@@ -79,7 +79,7 @@ func (t phpType) String() string {
 	v := t.Name
 	if t.IsArray {
 		v = "array"
-	} else if t.IsNull {
+	} else if t.IsNull && t.Name != "mixed" {
 		v = "?" + v
 	}
 

@@ -95,3 +95,11 @@ func TestQueryValue_IsStruct(t *testing.T) {
 		t.Errorf("IsStruct() should be true when Struct is set")
 	}
 }
+
+func TestPhpType_String_NullableMixed(t *testing.T) {
+	pt := phpType{Name: "mixed", IsNull: true}
+	expected := "mixed"
+	if got := pt.String(); got != expected {
+		t.Errorf("phpType.String() for nullable mixed = %q, want %q", got, expected)
+	}
+}
