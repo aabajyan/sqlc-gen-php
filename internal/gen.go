@@ -96,8 +96,7 @@ func Generate(_ context.Context, req *plugin.GenerateRequest) (*plugin.GenerateR
 		return nil, err
 	}
 
-	for i := range modelClasses {
-		modelClass := &modelClasses[i]
+	for _, modelClass := range modelClasses {
 		if err := executeTemplate(modelClass.Name+".php", modelsFile, &core.ModelsTmplCtx{
 			Package:     conf.Package,
 			SqlcVersion: req.SqlcVersion,

@@ -26,14 +26,17 @@ func (v Params) Args() string {
 	if v.isEmpty() {
 		return ""
 	}
+
 	var out []string
 	fields := v.ModelClass.Fields
 	for _, f := range fields {
 		out = append(out, f.Type.String()+" $"+f.Name)
 	}
+
 	if len(out) < 3 {
 		return strings.Join(out, ", ")
 	}
+
 	return "\n" + indent(strings.Join(out, ",\n"), 6, -1)
 }
 
@@ -41,10 +44,12 @@ func (v Params) Bindings() string {
 	if v.isEmpty() {
 		return ""
 	}
+
 	var out []string
 	for _, f := range v.ModelClass.Fields {
 		out = append(out, fmt.Sprintf("$%s", f.Name))
 	}
+
 	return indent(strings.Join(out, ",\n"), 10, 0)
 }
 
@@ -52,6 +57,7 @@ func pdoRowMapping(t phpType, name string) string {
 	if t.IsDateTimeImmutable() {
 		return fmt.Sprintf(`$row["%s"] == null ? null : new \DateTimeImmutable($row["%s"])`, name, name)
 	}
+
 	return fmt.Sprintf(`$row["%s"]`, name)
 }
 
@@ -60,6 +66,7 @@ func (v QueryValue) ResultSet() string {
 	for _, f := range v.Struct.Fields {
 		out = append(out, pdoRowMapping(f.Type, f.OriginalColumnName))
 	}
+
 	ret := indent(strings.Join(out, ",\n"), 4, -1)
 	return ret
 }
@@ -69,6 +76,7 @@ func dataClassName(name string) string {
 	for _, p := range strings.Split(name, "_") {
 		out += cases.Title(language.English).String(p)
 	}
+
 	return out
 }
 
@@ -76,12 +84,13 @@ func memberName(name string) string {
 	return sdk.LowerTitle(dataClassName(name))
 }
 
-func BuildDataClasses(req *plugin.GenerateRequest) []ModelClass {
-	var structs []ModelClass
+func BuildDataClasses(req *plugin.GenerateRequest) []*ModelClass {
+	var structs []*ModelClass
 	for _, schema := range req.Catalog.Schemas {
 		if schema.Name == "pg_catalog" || schema.Name == "information_schema" {
 			continue
 		}
+
 		for _, table := range schema.Tables {
 			var tableName string
 			if schema.Name == req.Catalog.DefaultSchema {
@@ -89,12 +98,14 @@ func BuildDataClasses(req *plugin.GenerateRequest) []ModelClass {
 			} else {
 				tableName = schema.Name + "_" + table.Rel.Name
 			}
+
 			structName := dataClassName(tableName)
 			s := ModelClass{
 				Table:   plugin.Identifier{Schema: schema.Name, Name: table.Rel.Name},
 				Name:    structName,
 				Comment: table.Comment,
 			}
+
 			for _, column := range table.Columns {
 				s.Fields = append(s.Fields, Field{
 					OriginalColumnName: column.Name,
@@ -103,9 +114,10 @@ func BuildDataClasses(req *plugin.GenerateRequest) []ModelClass {
 					Comment:            column.Comment,
 				})
 			}
-			structs = append(structs, s)
+			structs = append(structs, &s)
 		}
 	}
+
 	if len(structs) > 0 {
 		sort.Slice(structs, func(i, j int) bool { return structs[i].Name < structs[j].Name })
 	}
@@ -140,19 +152,19 @@ type goColumn struct {
 }
 
 func phpColumnsToStruct(req *plugin.GenerateRequest, name string, columns []goColumn, namer func(*plugin.Column, int) string) *ModelClass {
-	gs := ModelClass{
-		Name: name,
-	}
+	gs := ModelClass{Name: name}
 	idSeen := map[int]Field{}
 	nameSeen := map[string]int{}
 	for _, c := range columns {
 		if _, ok := idSeen[c.id]; ok {
 			continue
 		}
+
 		fieldName := memberName(namer(c.Column, c.id))
 		if v := nameSeen[c.Name]; v > 0 {
 			fieldName = fmt.Sprintf("%s_%d", fieldName, v+1)
 		}
+
 		field := Field{
 			OriginalColumnName: c.Column.Name,
 			ID:                 c.id,
@@ -163,6 +175,7 @@ func phpColumnsToStruct(req *plugin.GenerateRequest, name string, columns []goCo
 		nameSeen[c.Name]++
 		idSeen[c.id] = field
 	}
+
 	return &gs
 }
 
@@ -170,6 +183,7 @@ func phpParamName(c *plugin.Column, number int) string {
 	if c.Name != "" {
 		return c.Name
 	}
+
 	return fmt.Sprintf("dollar_%d", number)
 }
 
@@ -177,10 +191,11 @@ func phpColumnName(c *plugin.Column, pos int) string {
 	if c.Name != "" {
 		return c.Name
 	}
+
 	return fmt.Sprintf("column_%d", pos+1)
 }
 
-func BuildQueries(req *plugin.GenerateRequest, modelClasses []ModelClass) ([]Query, []*ModelClass, error) {
+func BuildQueries(req *plugin.GenerateRequest, modelClasses []*ModelClass) ([]Query, []*ModelClass, error) {
 	queries := make([]Query, 0, len(req.Queries))
 	emitModelClasses := make([]*ModelClass, 0)
 
@@ -188,6 +203,7 @@ func BuildQueries(req *plugin.GenerateRequest, modelClasses []ModelClass) ([]Que
 		if query.Name == "" || query.Cmd == "" {
 			continue
 		}
+
 		if query.Cmd == metadata.CmdCopyFrom {
 			return nil, nil, errors.New("support for CopyFrom in PHP is not implemented")
 		}
@@ -211,6 +227,7 @@ func BuildQueries(req *plugin.GenerateRequest, modelClasses []ModelClass) ([]Que
 				Column: p.Column,
 			})
 		}
+
 		params := phpColumnsToStruct(req, queryStruct.ClassName+"Bindings", cols, phpParamName)
 		queryStruct.Arg = Params{ModelClass: params}
 
@@ -223,11 +240,11 @@ func BuildQueries(req *plugin.GenerateRequest, modelClasses []ModelClass) ([]Que
 		} else if len(query.Columns) > 1 {
 			var gs *ModelClass
 
-			for i := range modelClasses {
-				s := &modelClasses[i]
+			for _, s := range modelClasses {
 				if len(s.Fields) != len(query.Columns) {
 					continue
 				}
+
 				same := true
 				for i, f := range s.Fields {
 					c := query.Columns[i]
@@ -236,6 +253,7 @@ func BuildQueries(req *plugin.GenerateRequest, modelClasses []ModelClass) ([]Que
 						break
 					}
 				}
+
 				if same {
 					gs = s
 					break
