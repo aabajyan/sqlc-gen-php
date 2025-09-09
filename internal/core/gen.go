@@ -47,6 +47,11 @@ func (v Params) Bindings() string {
 
 	var out []string
 	for _, f := range v.ModelClass.Fields {
+		if f.Type.IsJSON() {
+			out = append(out, fmt.Sprintf("json_encode($%s)", f.Name))
+			continue
+		}
+
 		out = append(out, fmt.Sprintf("$%s", f.Name))
 	}
 
@@ -56,6 +61,10 @@ func (v Params) Bindings() string {
 func pdoRowMapping(t phpType, name string) string {
 	if t.IsDateTimeImmutable() {
 		return fmt.Sprintf(`$row["%s"] == null ? null : new \DateTimeImmutable($row["%s"])`, name, name)
+	}
+
+	if t.IsJSON() {
+		return fmt.Sprintf(`json_decode($row["%s"], true)`, name)
 	}
 
 	return fmt.Sprintf(`$row["%s"]`, name)
