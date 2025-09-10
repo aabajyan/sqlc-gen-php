@@ -23,3 +23,13 @@ func TestJsonDataAuthor(t *testing.T) {
 
 	runGoldenTest(t, testCase)
 }
+
+func TestDateTimeImmutableAuthor(t *testing.T) {
+	testCase := TestCase{
+		Name:    "datetime_immutable",
+		Engine:  "sqlite",
+		Package: "Test\\DateTimeImmutable",
+	}
+
+	runGoldenTest(t, testCase)
+}

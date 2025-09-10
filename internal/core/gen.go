@@ -52,6 +52,11 @@ func (v Params) Bindings() string {
 			continue
 		}
 
+		if f.Type.IsDateTimeImmutable() {
+			out = append(out, fmt.Sprintf("$%s?->format('Y-m-d H:i:s')", f.Name))
+			continue
+		}
+
 		out = append(out, fmt.Sprintf("$%s", f.Name))
 	}
 
