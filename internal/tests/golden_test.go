@@ -14,6 +14,16 @@ func TestBasicAuthor(t *testing.T) {
 	runGoldenTest(t, testCase)
 }
 
+func TestCountExchanges(t *testing.T) {
+	testCase := TestCase{
+		Name:    "count_exchanges",
+		Engine:  "sqlite",
+		Package: "Test\\CountExchanges",
+	}
+
+	runGoldenTest(t, testCase)
+}
+
 func TestJsonDataAuthor(t *testing.T) {
 	testCase := TestCase{
 		Name:    "json_data",

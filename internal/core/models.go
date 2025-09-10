@@ -52,6 +52,15 @@ func (v QueryValue) Type() string {
 	panic("no type for QueryValue: " + v.Name)
 }
 
+func (v QueryValue) IsClass() bool {
+	switch v.Typ.Name {
+	case "int", "float", "string", "bool":
+		return false
+	default:
+		return true
+	}
+}
+
 type QueriesTmplCtx struct {
 	Package     string
 	Queries     []Query

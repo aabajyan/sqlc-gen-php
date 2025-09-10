@@ -56,11 +56,11 @@ func TestMemberName(t *testing.T) {
 func TestPdoRowMapping(t *testing.T) {
 	datetime := phpType{Name: "\\DateTimeImmutable"}
 	normal := phpType{Name: "int"}
-	if got := pdoRowMapping(datetime, "created_at"); got != "$row[\"created_at\"] == null ? null : new \\DateTimeImmutable($row[\"created_at\"])" {
+	if got := pdoRowMapping(datetime, 0); got != "$row[0] == null ? null : new \\DateTimeImmutable($row[0])" {
 		t.Errorf("pdoRowMapping(datetime) = %q", got)
 	}
 
-	if got := pdoRowMapping(normal, "id"); got != "$row[\"id\"]" {
+	if got := pdoRowMapping(normal, 0); got != "$row[0]" {
 		t.Errorf("pdoRowMapping(normal) = %q", got)
 	}
 }

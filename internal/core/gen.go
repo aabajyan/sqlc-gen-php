@@ -68,22 +68,34 @@ func (v Params) Bindings() string {
 	return strings.Join(out, ", ")
 }
 
-func pdoRowMapping(t phpType, name string) string {
+func pdoRowMapping(t phpType, idx int) string {
 	if t.IsDateTimeImmutable() {
-		return fmt.Sprintf(`$row["%s"] == null ? null : new \DateTimeImmutable($row["%s"])`, name, name)
+		return fmt.Sprintf(`$row[%d] == null ? null : new \DateTimeImmutable($row[%d])`, idx, idx)
 	}
 
 	if t.IsJSON() {
-		return fmt.Sprintf(`json_decode($row["%s"], true) ?? []`, name)
+		return fmt.Sprintf(`json_decode($row[%d], true) ?? []`, idx)
 	}
 
-	return fmt.Sprintf(`$row["%s"]`, name)
+	return fmt.Sprintf(`$row[%d]`, idx)
+}
+
+func (v QueryValue) PDOFetchMode() string {
+	if !v.IsClass() {
+		return "\\PDO::FETCH_COLUMN"
+	}
+
+	return "\\PDO::FETCH_NUM"
 }
 
 func (v QueryValue) ResultSet() string {
+	if !v.IsClass() {
+		return "$row"
+	}
+
 	var out []string
-	for _, f := range v.Struct.Fields {
-		out = append(out, pdoRowMapping(f.Type, f.OriginalColumnName))
+	for idx, f := range v.Struct.Fields {
+		out = append(out, pdoRowMapping(f.Type, idx))
 	}
 
 	ret := strings.Join(out, ", ")

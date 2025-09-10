@@ -37,14 +37,14 @@ final readonly class QueriesImpl implements Queries {
     {
         $stmt = $this->pdo->prepare(getAuthor);
         $stmt->execute([$authorId]);
-        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         if(count($results) != 1){
             throw new \Exception('Expected exactly 1 row, but got ' . count($results));
         }
-        foreach ($results as $row) {
-            $ret[] = new Author($row["author_id"], $row["name"]);
-        }
+
+        $row = $results[0];
+        $ret[] = new Author($row[0], $row[1]);
         return $ret[0];
     }
 
@@ -56,13 +56,10 @@ final readonly class QueriesImpl implements Queries {
     {
         $stmt = $this->pdo->prepare(listAuthors);
         $stmt->execute([]);
-        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        /**
-         * @var Author[]
-         */
+        $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         foreach ($results as $row) {
-            $ret[] = new Author($row["author_id"], $row["name"]);
+            $ret[] = new Author($row[0], $row[1]);
         }
         return $ret;
     }

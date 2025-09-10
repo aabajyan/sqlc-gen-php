@@ -44,14 +44,14 @@ final readonly class QueriesImpl implements Queries {
     {
         $stmt = $this->pdo->prepare(getAuthorByCreatedAt);
         $stmt->execute([$createdAt->format('Y-m-d H:i:s')]);
-        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         if(count($results) != 1){
             throw new \Exception('Expected exactly 1 row, but got ' . count($results));
         }
-        foreach ($results as $row) {
-            $ret[] = new Author($row["id"], $row["name"], $row["created_at"] == null ? null : new \DateTimeImmutable($row["created_at"]));
-        }
+
+        $row = $results[0];
+        $ret[] = new Author($row[0], $row[1], $row[2] == null ? null : new \DateTimeImmutable($row[2]));
         return $ret[0];
     }
 
