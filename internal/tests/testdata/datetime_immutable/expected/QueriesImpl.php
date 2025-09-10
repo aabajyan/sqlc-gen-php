@@ -33,8 +33,7 @@ final readonly class QueriesImpl implements Queries {
     public function addAuthor(string $name, ?\DateTimeImmutable $createdAt): void
     {
         $stmt = $this->pdo->prepare(addAuthor);
-        $stmt->execute([$name,
-          $createdAt?->format('Y-m-d H:i:s')]);
+        $stmt->execute([$name, $createdAt?->format('Y-m-d H:i:s')]);
     }
 
     /**

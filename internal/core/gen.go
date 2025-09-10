@@ -65,7 +65,7 @@ func (v Params) Bindings() string {
 		out = append(out, fmt.Sprintf("$%s", f.Name))
 	}
 
-	return indent(strings.Join(out, ",\n"), 10, 0)
+	return strings.Join(out, ", ")
 }
 
 func pdoRowMapping(t phpType, name string) string {
