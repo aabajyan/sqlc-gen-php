@@ -33,9 +33,6 @@ final readonly class QueriesImpl implements Queries {
         $stmt = $this->pdo->prepare({{.ConstantName}});
         $stmt->execute([{{ .Arg.Bindings }}]);
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        /**
-         * @var {{.Ret.Type}}[]
-         */
         $ret = [];
         if(count($results) != 1){
             throw new \Exception("NOT 1 ROW RETURNED");

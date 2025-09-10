@@ -45,9 +45,6 @@ final readonly class QueriesImpl implements Queries {
         $stmt = $this->pdo->prepare(getAuthorByCreatedAt);
         $stmt->execute([$createdAt->format('Y-m-d H:i:s')]);
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        /**
-         * @var Author[]
-         */
         $ret = [];
         if(count($results) != 1){
             throw new \Exception("NOT 1 ROW RETURNED");
