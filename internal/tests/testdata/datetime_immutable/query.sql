@@ -10,4 +10,4 @@ WHERE
 INSERT INTO
     author (name, created_at)
 VALUES
-    (?, ?);
+    (sqlc.arg(name), sqlc.narg(created_at));

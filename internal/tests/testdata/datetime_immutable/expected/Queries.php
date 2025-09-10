@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Test\DateTimeImmutable;
 
 interface Queries {
-  public function addAuthor(string $name, \DateTimeImmutable $createdAt): void;
+  public function addAuthor(string $name, ?\DateTimeImmutable $createdAt): void;
   
   public function getAuthorByCreatedAt(\DateTimeImmutable $createdAt): ?Author;
   

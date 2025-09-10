@@ -12,7 +12,7 @@ const addAuthor = "-- name: addAuthor :exec
 INSERT INTO
     author (name, created_at)
 VALUES
-    (?, ?)
+    (?1, ?2)
 ";
 
 const getAuthorByCreatedAt = "-- name: getAuthorByCreatedAt :one
@@ -30,7 +30,7 @@ final readonly class QueriesImpl implements Queries {
     /**
      * @throws \Exception
      */
-    public function addAuthor(string $name, \DateTimeImmutable $createdAt): void
+    public function addAuthor(string $name, ?\DateTimeImmutable $createdAt): void
     {
         $stmt = $this->pdo->prepare(addAuthor);
         $stmt->execute([$name,
@@ -44,7 +44,7 @@ final readonly class QueriesImpl implements Queries {
     public function getAuthorByCreatedAt(\DateTimeImmutable $createdAt): ?Author
     {
         $stmt = $this->pdo->prepare(getAuthorByCreatedAt);
-        $stmt->execute([$createdAt?->format('Y-m-d H:i:s')]);
+        $stmt->execute([$createdAt->format('Y-m-d H:i:s')]);
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         /**
          * @var Author[]
