@@ -47,7 +47,7 @@ final readonly class QueriesImpl implements Queries {
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         $ret = [];
         if(count($results) != 1){
-            throw new \Exception("NOT 1 ROW RETURNED");
+            throw new \Exception('Expected exactly 1 row, but got ' . count($results));
         }
         foreach ($results as $row) {
             $ret[] = new Author($row["id"], $row["name"], $row["created_at"] == null ? null : new \DateTimeImmutable($row["created_at"]));
