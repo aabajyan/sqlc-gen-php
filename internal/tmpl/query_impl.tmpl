@@ -31,7 +31,7 @@ final readonly class QueriesImpl implements Queries {
     public function {{.MethodName}}({{.Arg.Args}}): ?{{.Ret.Type}}
     {
         $stmt = $this->pdo->prepare({{.ConstantName}});
-        $stmt->execute([{{ .Arg.Bindings }}]);
+        $stmt->execute({{ .Arg.Bindings }});
         $results = $stmt->fetchAll({{.Ret.PDOFetchMode}});
         $ret = [];
         if(count($results) != 1){
@@ -58,7 +58,7 @@ final readonly class QueriesImpl implements Queries {
     public function {{.MethodName}}({{.Arg.Args}}): array
     {
         $stmt = $this->pdo->prepare({{.ConstantName}});
-        $stmt->execute([{{ .Arg.Bindings }}]);
+        $stmt->execute({{ .Arg.Bindings }});
         $results = $stmt->fetchAll({{.Ret.PDOFetchMode}});
         $ret = [];
         foreach ($results as $row) {
@@ -81,7 +81,7 @@ final readonly class QueriesImpl implements Queries {
     public function {{.MethodName}}({{.Arg.Args}}): void
     {
         $stmt = $this->pdo->prepare({{.ConstantName}});
-        $stmt->execute([{{ .Arg.Bindings }}]);
+        $stmt->execute({{ .Arg.Bindings }});
     }
 {{end}}
 
@@ -94,7 +94,7 @@ final readonly class QueriesImpl implements Queries {
     public function {{.MethodName}}({{.Arg.Args}}): int|string
     {
         $stmt = $this->pdo->prepare({{.ConstantName}});
-        $stmt->execute([{{ .Arg.Bindings }}]);
+        $stmt->execute({{ .Arg.Bindings }});
         return $this->pdo->lastInsertId();
     }
 {{end}}
@@ -107,7 +107,7 @@ final readonly class QueriesImpl implements Queries {
      */
     public function {{.MethodName}}({{.Arg.Args}}): int|string {
         $stmt = $this->pdo->prepare({{.ConstantName}});
-        $stmt->execute([{{ .Arg.Bindings }}]);
+        $stmt->execute({{ .Arg.Bindings }});
         return $this->pdo->lastInsertId();
     }
 {{end}}

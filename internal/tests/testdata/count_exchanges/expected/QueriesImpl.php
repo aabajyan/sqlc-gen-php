@@ -43,7 +43,7 @@ final readonly class QueriesImpl implements Queries {
     public function countExchanges(): ?int
     {
         $stmt = $this->pdo->prepare(countExchanges);
-        $stmt->execute([]);
+        $stmt->execute();
         $results = $stmt->fetchAll(\PDO::FETCH_COLUMN);
         $ret = [];
         if(count($results) != 1){
@@ -62,7 +62,7 @@ final readonly class QueriesImpl implements Queries {
     public function getAllExchanges(): array
     {
         $stmt = $this->pdo->prepare(getAllExchanges);
-        $stmt->execute([]);
+        $stmt->execute();
         $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         foreach ($results as $row) {

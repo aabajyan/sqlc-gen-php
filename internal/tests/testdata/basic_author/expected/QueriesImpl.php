@@ -55,7 +55,7 @@ final readonly class QueriesImpl implements Queries {
     public function listAuthors(): array
     {
         $stmt = $this->pdo->prepare(listAuthors);
-        $stmt->execute([]);
+        $stmt->execute();
         $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         foreach ($results as $row) {
