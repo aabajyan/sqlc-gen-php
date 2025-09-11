@@ -1,6 +1,6 @@
 module github.com/lcarilla/sqlc-plugin-php-dbal
 
-go 1.23.0
+go 1.24.0
 
 toolchain go1.24.1
 
@@ -11,7 +11,7 @@ require (
 )
 
 require (
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	golang.org/x/net v0.37.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250313205543-e70fdf4c4cb4 // indirect

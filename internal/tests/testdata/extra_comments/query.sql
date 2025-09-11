@@ -1,7 +1,7 @@
 /* name: ListEntities :many */
-/* @param bool|null $locked */
-/* @param int|null $ownerId */
-/* @param string|null $title */
+/* @sqlc-param bool|null $locked=null */
+/* @sqlc-param int|null $owner_id=null */
+/* @sqlc-param string|null $title=null */
 SELECT
     *
 FROM

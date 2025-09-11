@@ -29,7 +29,7 @@ final readonly class QueriesImpl implements Queries {
      * @return {{.Ret.Type}}|null
      * @throws \Exception
      */
-    public function {{.MethodName}}({{.Arg.Args}}): ?{{.Ret.Type}}
+    public function {{.MethodName}}({{.Arg.ArgsWithDefaults}}): ?{{.Ret.Type}}
     {
         $stmt = $this->pdo->prepare({{.ConstantName}});
         $stmt->execute({{ .Arg.Bindings }});
@@ -57,7 +57,7 @@ final readonly class QueriesImpl implements Queries {
      * @return {{.Ret.Type}}[]
      * @throws \Exception
      */
-    public function {{.MethodName}}({{.Arg.Args}}): array
+    public function {{.MethodName}}({{.Arg.ArgsWithDefaults}}): array
     {
         $stmt = $this->pdo->prepare({{.ConstantName}});
         $stmt->execute({{ .Arg.Bindings }});
@@ -81,7 +81,7 @@ final readonly class QueriesImpl implements Queries {
     {{- end }}
      * @throws \Exception
      */
-    public function {{.MethodName}}({{.Arg.Args}}): void
+    public function {{.MethodName}}({{.Arg.ArgsWithDefaults}}): void
     {
         $stmt = $this->pdo->prepare({{.ConstantName}});
         $stmt->execute({{ .Arg.Bindings }});
@@ -95,7 +95,7 @@ final readonly class QueriesImpl implements Queries {
     {{- end }}
      * @throws \Exception
      */
-    public function {{.MethodName}}({{.Arg.Args}}): int|string
+    public function {{.MethodName}}({{.Arg.ArgsWithDefaults}}): int|string
     {
         $stmt = $this->pdo->prepare({{.ConstantName}});
         $stmt->execute({{ .Arg.Bindings }});
@@ -110,7 +110,7 @@ final readonly class QueriesImpl implements Queries {
     {{- end }}
      * @throws \Exception
      */
-    public function {{.MethodName}}({{.Arg.Args}}): int|string {
+    public function {{.MethodName}}({{.Arg.ArgsWithDefaults}}): int|string {
         $stmt = $this->pdo->prepare({{.ConstantName}});
         $stmt->execute({{ .Arg.Bindings }});
         return $this->pdo->lastInsertId();

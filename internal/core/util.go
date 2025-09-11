@@ -23,3 +23,33 @@ func indent(s string, n int, firstIndent int) string {
 	}
 	return buf.String()
 }
+
+type paramOverride struct{ typ, def string }
+
+// FIXME: This is very barebones and only supports simple format
+func parseSQLCParamComments(comments []string) map[string]paramOverride {
+	out := map[string]paramOverride{}
+	for _, c := range comments {
+		line := strings.TrimSpace(c)
+		if !strings.HasPrefix(line, "@sqlc-param") {
+			continue
+		}
+
+		toks := strings.Fields(line)
+		if len(toks) < 3 {
+			continue
+		}
+
+		typ := toks[1]
+		nameToken := toks[2]
+		name := nameToken
+		def := ""
+		if eq := strings.Index(nameToken, "="); eq != -1 {
+			name = nameToken[:eq]
+			def = strings.TrimSpace(nameToken[eq+1:])
+		}
+
+		out[name] = paramOverride{typ: typ, def: def}
+	}
+	return out
+}

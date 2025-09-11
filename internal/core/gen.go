@@ -30,14 +30,30 @@ func (v Params) Args() string {
 	var out []string
 	fields := v.ModelClass.Fields
 	for _, f := range fields {
-		out = append(out, f.Type.String()+" $"+f.Name)
+		sig := f.Type.String() + " $" + f.Name
+		out = append(out, sig)
 	}
 
-	if len(out) < 3 {
-		return strings.Join(out, ", ")
+	return strings.Join(out, ", ")
+}
+
+func (v Params) ArgsWithDefaults() string {
+	if v.isEmpty() {
+		return ""
 	}
 
-	return "\n" + indent(strings.Join(out, ",\n"), 6, -1)
+	var out []string
+	fields := v.ModelClass.Fields
+	for _, f := range fields {
+		sig := f.Type.String() + " $" + f.Name
+		if f.Default != "" {
+			sig += " = " + f.Default
+		}
+
+		out = append(out, sig)
+	}
+
+	return strings.Join(out, ", ")
 }
 
 func (v Params) Bindings() string {
@@ -182,7 +198,9 @@ func mapSqlColumnTypeToPhpType(req *plugin.GenerateRequest, col *plugin.Column) 
 }
 
 type goColumn struct {
-	id int
+	id      int
+	docType string
+	defVal  string
 	*plugin.Column
 }
 
@@ -206,6 +224,15 @@ func phpColumnsToStruct(req *plugin.GenerateRequest, name string, columns []goCo
 			Name:               fieldName,
 			Type:               makePhpTypeFromSqlcColumn(req, c.Column),
 		}
+
+		if c.docType != "" {
+			field.Type = phpType{Name: c.docType}
+		}
+
+		if c.defVal != "" {
+			field.Default = c.defVal
+		}
+
 		gs.Fields = append(gs.Fields, field)
 		nameSeen[c.Name]++
 		idSeen[c.id] = field
@@ -261,10 +288,14 @@ func BuildQueries(req *plugin.GenerateRequest, modelClasses []*ModelClass) ([]Qu
 		}
 
 		var cols []goColumn
+		overrides := parseSQLCParamComments(trimmedComments)
 		for _, p := range query.Params {
+			paramName := "$" + phpParamName(p.Column, int(p.Number))
 			cols = append(cols, goColumn{
-				id:     int(p.Number),
-				Column: p.Column,
+				id:      int(p.Number),
+				Column:  p.Column,
+				docType: overrides[paramName].typ,
+				defVal:  overrides[paramName].def,
 			})
 		}
 

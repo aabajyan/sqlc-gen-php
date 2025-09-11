@@ -21,6 +21,8 @@ type Field struct {
 	OriginalColumnName string
 	Type               phpType
 	Comment            string
+	Default            string
+	DocType            string
 }
 
 type ModelClass struct {

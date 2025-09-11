@@ -12,10 +12,7 @@ interface Queries {
   /**
   *  @return Entity[]
   */
-  public function listEntities(
-      mixed $locked,
-      mixed $ownerId,
-      mixed $title): array;
+  public function listEntities(bool|null $locked, int|null $ownerId, string|null $title): array;
   
 }
 

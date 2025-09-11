@@ -34,16 +34,13 @@ final readonly class QueriesImpl implements Queries {
     public function __construct(private \PDO $pdo) {}
 
     /**
-     * @param bool|null $locked
-     * @param int|null $ownerId
-     * @param string|null $title
+     * @sqlc-param bool|null $locked=null
+     * @sqlc-param int|null $owner_id=null
+     * @sqlc-param string|null $title=null
      * @return Entity[]
      * @throws \Exception
      */
-    public function listEntities(
-      mixed $locked,
-      mixed $ownerId,
-      mixed $title): array
+    public function listEntities(bool|null $locked = null, int|null $ownerId = null, string|null $title = null): array
     {
         $stmt = $this->pdo->prepare(listEntities);
         $stmt->execute([$locked, $ownerId, $title]);

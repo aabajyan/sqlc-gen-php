@@ -31,7 +31,7 @@ func TestParams_Args(t *testing.T) {
 func TestParams_Bindings(t *testing.T) {
 	mc := &ModelClass{Fields: []Field{{Name: "foo", Type: phpType{Name: "int"}}}}
 	p := Params{ModelClass: mc}
-	expected := "$foo"
+	expected := "[$foo]"
 	if got := p.Bindings(); got != expected {
 		t.Errorf("Bindings() = %q, want %q", got, expected)
 	}
@@ -56,7 +56,7 @@ func TestMemberName(t *testing.T) {
 func TestPdoRowMapping(t *testing.T) {
 	datetime := phpType{Name: "\\DateTimeImmutable"}
 	normal := phpType{Name: "int"}
-	if got := pdoRowMapping(datetime, 0); got != "$row[0] == null ? null : new \\DateTimeImmutable($row[0])" {
+	if got := pdoRowMapping(datetime, 0); got != "new \\DateTimeImmutable($row[0])" {
 		t.Errorf("pdoRowMapping(datetime) = %q", got)
 	}
 
