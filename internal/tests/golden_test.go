@@ -43,3 +43,13 @@ func TestDateTimeImmutableAuthor(t *testing.T) {
 
 	runGoldenTest(t, testCase)
 }
+
+func TestExtraComments(t *testing.T) {
+	testCase := TestCase{
+		Name:    "extra_comments",
+		Engine:  "sqlite",
+		Package: "Test\\ExtraComments",
+	}
+
+	runGoldenTest(t, testCase)
+}

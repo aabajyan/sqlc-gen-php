@@ -22,9 +22,10 @@ final readonly class QueriesImpl implements Queries {
 
     {{range .Queries}}
     {{if eq .Cmd ":one"}}
-    {{range .Comments}}//{{.}}
-    {{end}}
     /**
+    {{- range .Comments }}
+     * {{.}}
+    {{- end }}
      * @return {{.Ret.Type}}|null
      * @throws \Exception
      */
@@ -49,9 +50,10 @@ final readonly class QueriesImpl implements Queries {
 {{end}}
 
 {{if eq .Cmd ":many"}}
-{{range .Comments}}//{{.}}
-{{end}}
     /**
+    {{- range .Comments }}
+     * {{.}}
+    {{- end }}
      * @return {{.Ret.Type}}[]
      * @throws \Exception
      */
@@ -73,9 +75,10 @@ final readonly class QueriesImpl implements Queries {
 {{end}}
 
 {{if eq .Cmd ":exec"}}
-{{range .Comments}}//{{.}}
-{{end}}
     /**
+    {{- range .Comments }}
+     * {{.}}
+    {{- end }}
      * @throws \Exception
      */
     public function {{.MethodName}}({{.Arg.Args}}): void
@@ -86,9 +89,10 @@ final readonly class QueriesImpl implements Queries {
 {{end}}
 
 {{if eq .Cmd ":execrows"}}
-{{range .Comments}}//{{.}}
-{{end}}
     /**
+    {{- range .Comments }}
+     * {{.}}
+    {{- end }}
      * @throws \Exception
      */
     public function {{.MethodName}}({{.Arg.Args}}): int|string
@@ -100,9 +104,10 @@ final readonly class QueriesImpl implements Queries {
 {{end}}
 
 {{if eq .Cmd ":execresult"}}
-{{range .Comments}}//{{.}}
-{{end}}
     /**
+    {{- range .Comments }}
+     * {{.}}
+    {{- end }}
      * @throws \Exception
      */
     public function {{.MethodName}}({{.Arg.Args}}): int|string {

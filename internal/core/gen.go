@@ -177,7 +177,7 @@ func mapSqlColumnTypeToPhpType(req *plugin.GenerateRequest, col *plugin.Column) 
 	case "mysql":
 		return mysqlType(col)
 	default:
-		return "Any"
+		return "mixed"
 	}
 }
 
@@ -244,6 +244,11 @@ func BuildQueries(req *plugin.GenerateRequest, modelClasses []*ModelClass) ([]Qu
 		}
 
 		queryString := query.Text
+		trimmedComments := make([]string, len(query.Comments))
+		for i, c := range query.Comments {
+			trimmedComments[i] = strings.TrimSpace(c)
+		}
+
 		queryStruct := Query{
 			Cmd:          query.Cmd,
 			ClassName:    strings.ToUpper(query.Name[:1]) + query.Name[1:],
@@ -252,7 +257,7 @@ func BuildQueries(req *plugin.GenerateRequest, modelClasses []*ModelClass) ([]Qu
 			MethodName:   sdk.LowerTitle(query.Name),
 			SourceName:   query.Filename,
 			SQL:          queryString,
-			Comments:     query.Comments,
+			Comments:     trimmedComments,
 		}
 
 		var cols []goColumn
