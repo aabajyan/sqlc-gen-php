@@ -70,7 +70,11 @@ func (v Params) Bindings() string {
 
 func pdoRowMapping(t phpType, idx int) string {
 	if t.IsDateTimeImmutable() {
-		return fmt.Sprintf(`$row[%d] == null ? null : new \DateTimeImmutable($row[%d])`, idx, idx)
+		if t.IsNull {
+			return fmt.Sprintf(`$row[%d] == null ? null : new \DateTimeImmutable($row[%d])`, idx, idx)
+		}
+
+		return fmt.Sprintf(`new \DateTimeImmutable($row[%d])`, idx)
 	}
 
 	if t.IsJSON() {

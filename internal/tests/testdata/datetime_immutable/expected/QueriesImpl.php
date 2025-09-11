@@ -51,7 +51,7 @@ final readonly class QueriesImpl implements Queries {
         }
 
         $row = $results[0];
-        $ret[] = new Author($row[0], $row[1], $row[2] == null ? null : new \DateTimeImmutable($row[2]));
+        $ret[] = new Author($row[0], $row[1], new \DateTimeImmutable($row[2]));
         return $ret[0];
     }
 
