@@ -53,3 +53,13 @@ func TestExtraComments(t *testing.T) {
 
 	runGoldenTest(t, testCase)
 }
+
+func TestBoolTypeBoolMysql(t *testing.T) {
+	testCase := TestCase{
+		Name:    "skip_phpcode",
+		Engine:  "mysql",
+		Package: "Test\\BoolType",
+	}
+
+	runGoldenTest(t, testCase)
+}

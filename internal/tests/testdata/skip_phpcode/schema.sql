@@ -1,0 +1,1 @@
+CREATE TABLE dummy (flag BOOLEAN NOT NULL);

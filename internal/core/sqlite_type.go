@@ -20,7 +20,7 @@ func sqliteType(col *plugin.Column) string {
 	case "blob":
 		return "string"
 	case "boolean":
-		return "boolean"
+		return "bool"
 	case "date", "datetime":
 		return "\\DateTimeImmutable"
 	case "numeric":
