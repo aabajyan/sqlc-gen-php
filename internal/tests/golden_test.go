@@ -63,3 +63,13 @@ func TestBoolTypeBoolMysql(t *testing.T) {
 
 	runGoldenTest(t, testCase)
 }
+
+func TestArgsWithDefaults(t *testing.T) {
+	testCase := TestCase{
+		Name:    "args_with_defaults",
+		Engine:  "sqlite",
+		Package: "Test\\ArgsWithDefaults",
+	}
+
+	runGoldenTest(t, testCase)
+}

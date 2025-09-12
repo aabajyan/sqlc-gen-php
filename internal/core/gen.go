@@ -22,18 +22,39 @@ func (v Params) isEmpty() bool {
 	return len(v.ModelClass.Fields) == 0
 }
 
+func splitFieldsByDefault(fields []Field, withDefault func(Field) string, withoutDefault func(Field) string) (nonDefaults, defaults []string) {
+	for _, f := range fields {
+		if f.Default != "" {
+			defaults = append(defaults, withDefault(f))
+			continue
+		}
+
+		nonDefaults = append(nonDefaults, withoutDefault(f))
+	}
+	return
+}
+
+func withoutDefaultCallback(f Field) string {
+	return f.Type.String() + " $" + f.Name
+}
+
+func withDefaultCallback(f Field) string {
+	return withoutDefaultCallback(f) + " = " + f.Default
+}
+
 func (v Params) Args() string {
 	if v.isEmpty() {
 		return ""
 	}
 
-	var out []string
 	fields := v.ModelClass.Fields
-	for _, f := range fields {
-		sig := f.Type.String() + " $" + f.Name
-		out = append(out, sig)
-	}
+	nonDefaults, defaults := splitFieldsByDefault(
+		fields,
+		withoutDefaultCallback,
+		withoutDefaultCallback,
+	)
 
+	out := append(nonDefaults, defaults...)
 	return strings.Join(out, ", ")
 }
 
@@ -42,17 +63,14 @@ func (v Params) ArgsWithDefaults() string {
 		return ""
 	}
 
-	var out []string
 	fields := v.ModelClass.Fields
-	for _, f := range fields {
-		sig := f.Type.String() + " $" + f.Name
-		if f.Default != "" {
-			sig += " = " + f.Default
-		}
+	nonDefaults, defaults := splitFieldsByDefault(
+		fields,
+		withDefaultCallback,
+		withoutDefaultCallback,
+	)
 
-		out = append(out, sig)
-	}
-
+	out := append(nonDefaults, defaults...)
 	return strings.Join(out, ", ")
 }
 
