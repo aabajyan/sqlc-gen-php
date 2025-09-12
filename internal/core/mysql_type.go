@@ -35,7 +35,7 @@ func mysqlType(col *plugin.Column) string {
 		return "bool"
 
 	case "json":
-		return "string"
+		return "array"
 
 	case "any":
 		return "mixed"
