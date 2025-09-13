@@ -102,6 +102,10 @@ func pdoRowMapping(t phpType, idx int) string {
 		return fmt.Sprintf(`json_decode($row[%d], true) ?? []`, idx)
 	}
 
+	if t.IsBoolean() {
+		return fmt.Sprintf(`(bool) $row[%d]`, idx)
+	}
+
 	return fmt.Sprintf(`$row[%d]`, idx)
 }
 

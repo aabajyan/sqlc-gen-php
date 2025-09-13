@@ -40,7 +40,7 @@ final readonly class QueriesImpl implements Queries {
         $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         foreach ($results as $row) {
-            $ret[] = new FeatureFlags($row[0], $row[1], $row[2]);
+            $ret[] = new FeatureFlags($row[0], $row[1], (bool) $row[2]);
         }
         return $ret;
     }
