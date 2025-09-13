@@ -97,6 +97,10 @@ func (t phpType) String() string {
 	return v
 }
 
+func (t phpType) IsBoolean() bool {
+	return t.Name == "bool"
+}
+
 func (t phpType) IsDateTimeImmutable() bool {
 	return t.Name == "\\DateTimeImmutable"
 }

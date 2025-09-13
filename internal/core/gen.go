@@ -96,6 +96,11 @@ func (v Params) Bindings() string {
 			continue
 		}
 
+		if f.Type.IsBoolean() {
+			out = append(out, fmt.Sprintf("($%s ? 1 : 0)", f.Name))
+			continue
+		}
+
 		out = append(out, fmt.Sprintf("$%s", f.Name))
 	}
 

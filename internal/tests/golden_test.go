@@ -73,3 +73,13 @@ func TestArgsWithDefaults(t *testing.T) {
 
 	runGoldenTest(t, testCase)
 }
+
+func TestBooleanBindings(t *testing.T) {
+	testCase := TestCase{
+		Name:    "boolean_bindings",
+		Engine:  "sqlite",
+		Package: "Test\\BooleanBindings",
+	}
+
+	runGoldenTest(t, testCase)
+}
