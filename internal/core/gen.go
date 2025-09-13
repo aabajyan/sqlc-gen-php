@@ -86,16 +86,6 @@ func (v Params) Bindings() string {
 			continue
 		}
 
-		if f.Type.IsDateTimeImmutable() {
-			questionMark := ""
-			if f.Type.IsNull {
-				questionMark = "?"
-			}
-
-			out = append(out, fmt.Sprintf("$%s%s->format('Y-m-d H:i:s')", f.Name, questionMark))
-			continue
-		}
-
 		if f.Type.IsBoolean() {
 			out = append(out, fmt.Sprintf("($%s ? 1 : 0)", f.Name))
 			continue
@@ -108,14 +98,6 @@ func (v Params) Bindings() string {
 }
 
 func pdoRowMapping(t phpType, idx int) string {
-	if t.IsDateTimeImmutable() {
-		if t.IsNull {
-			return fmt.Sprintf(`$row[%d] == null ? null : new \DateTimeImmutable($row[%d])`, idx, idx)
-		}
-
-		return fmt.Sprintf(`new \DateTimeImmutable($row[%d])`, idx)
-	}
-
 	if t.IsJSON() {
 		return fmt.Sprintf(`json_decode($row[%d], true) ?? []`, idx)
 	}

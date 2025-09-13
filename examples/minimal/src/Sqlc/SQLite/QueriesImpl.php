@@ -150,13 +150,10 @@ final readonly class QueriesImpl implements Queries {
     {
         $stmt = $this->pdo->prepare(bookByTags);
         $stmt->execute([$tags]);
-        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        /**
-         * @var BookByTagsRow[]
-         */
+        $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         foreach ($results as $row) {
-            $ret[] = new BookByTagsRow($row["book_id"], $row["title"], $row["name"], $row["isbn"], $row["tags"]);
+            $ret[] = new BookByTagsRow($row[0], $row[1], $row[2], $row[3], $row[4]);
         }
         return $ret;
     }
@@ -169,13 +166,10 @@ final readonly class QueriesImpl implements Queries {
     {
         $stmt = $this->pdo->prepare(bookByTagsMultiple);
         $stmt->execute([$tags]);
-        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        /**
-         * @var BookByTagsMultipleRow[]
-         */
+        $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         foreach ($results as $row) {
-            $ret[] = new BookByTagsMultipleRow($row["book_id"], $row["title"], $row["name"], $row["isbn"], $row["tags"]);
+            $ret[] = new BookByTagsMultipleRow($row[0], $row[1], $row[2], $row[3], $row[4]);
         }
         return $ret;
     }
@@ -187,15 +181,11 @@ final readonly class QueriesImpl implements Queries {
     public function bookByTitleYear(mixed $uuidToBin, int $yr): array
     {
         $stmt = $this->pdo->prepare(bookByTitleYear);
-        $stmt->execute([$uuidToBin,
-          $yr]);
-        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        /**
-         * @var Book[]
-         */
+        $stmt->execute([$uuidToBin, $yr]);
+        $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         foreach ($results as $row) {
-            $ret[] = new Book($row["book_id"], $row["author_id"], $row["isbn"], $row["book_type"], $row["title"], $row["yr"], $row["available"] == null ? null : new \DateTimeImmutable($row["available"]), $row["tags"]);
+            $ret[] = new Book($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7]);
         }
         return $ret;
     }
@@ -212,22 +202,9 @@ final readonly class QueriesImpl implements Queries {
     /**
      * @throws \Exception
      */
-    public function createBook(
-      int $authorId,
-      string $isbn,
-      string $bookType,
-      mixed $uuidToBin,
-      int $yr,
-      \DateTimeImmutable $available,
-      string $tags): int|string {
+    public function createBook(int $authorId, string $isbn, string $bookType, mixed $uuidToBin, int $yr, string $available, string $tags): int|string {
         $stmt = $this->pdo->prepare(createBook);
-        $stmt->execute([$authorId,
-          $isbn,
-          $bookType,
-          $uuidToBin,
-          $yr,
-          $available,
-          $tags]);
+        $stmt->execute([$authorId, $isbn, $bookType, $uuidToBin, $yr, $available, $tags]);
         return $this->pdo->lastInsertId();
     }
 
@@ -237,8 +214,7 @@ final readonly class QueriesImpl implements Queries {
     public function deleteAuthorBeforeYear(int $yr, int $authorId): void
     {
         $stmt = $this->pdo->prepare(deleteAuthorBeforeYear);
-        $stmt->execute([$yr,
-          $authorId]);
+        $stmt->execute([$yr, $authorId]);
     }
 
     /**
@@ -258,17 +234,14 @@ final readonly class QueriesImpl implements Queries {
     {
         $stmt = $this->pdo->prepare(getAuthor);
         $stmt->execute([$authorId]);
-        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        /**
-         * @var Author[]
-         */
+        $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         if(count($results) != 1){
-            throw new \Exception("NOT 1 ROW RETURNED");
+            throw new \Exception('Expected exactly 1 row, but got ' . count($results));
         }
-        foreach ($results as $row) {
-            $ret[] = new Author($row["author_id"], $row["name"]);
-        }
+
+        $row = $results[0];
+        $ret[] = new Author($row[0], $row[1]);
         return $ret[0];
     }
 
@@ -280,17 +253,14 @@ final readonly class QueriesImpl implements Queries {
     {
         $stmt = $this->pdo->prepare(getBook);
         $stmt->execute([$bookId]);
-        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        /**
-         * @var Book[]
-         */
+        $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         if(count($results) != 1){
-            throw new \Exception("NOT 1 ROW RETURNED");
+            throw new \Exception('Expected exactly 1 row, but got ' . count($results));
         }
-        foreach ($results as $row) {
-            $ret[] = new Book($row["book_id"], $row["author_id"], $row["isbn"], $row["book_type"], $row["title"], $row["yr"], $row["available"] == null ? null : new \DateTimeImmutable($row["available"]), $row["tags"]);
-        }
+
+        $row = $results[0];
+        $ret[] = new Book($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7]);
         return $ret[0];
     }
 
@@ -301,14 +271,11 @@ final readonly class QueriesImpl implements Queries {
     public function listAuthors(): array
     {
         $stmt = $this->pdo->prepare(listAuthors);
-        $stmt->execute([]);
-        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        /**
-         * @var Author[]
-         */
+        $stmt->execute();
+        $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         foreach ($results as $row) {
-            $ret[] = new Author($row["author_id"], $row["name"]);
+            $ret[] = new Author($row[0], $row[1]);
         }
         return $ret;
     }
@@ -316,31 +283,19 @@ final readonly class QueriesImpl implements Queries {
     /**
      * @throws \Exception
      */
-    public function updateBook(
-      string $title,
-      string $tags,
-      int $bookId): void
+    public function updateBook(string $title, string $tags, int $bookId): void
     {
         $stmt = $this->pdo->prepare(updateBook);
-        $stmt->execute([$title,
-          $tags,
-          $bookId]);
+        $stmt->execute([$title, $tags, $bookId]);
     }
 
     /**
      * @throws \Exception
      */
-    public function updateBookISBN(
-      string $title,
-      string $tags,
-      string $isbn,
-      int $bookId): void
+    public function updateBookISBN(string $title, string $tags, string $isbn, int $bookId): void
     {
         $stmt = $this->pdo->prepare(updateBookISBN);
-        $stmt->execute([$title,
-          $tags,
-          $isbn,
-          $bookId]);
+        $stmt->execute([$title, $tags, $isbn, $bookId]);
     }
 
 }

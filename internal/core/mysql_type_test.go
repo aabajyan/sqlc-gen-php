@@ -18,7 +18,7 @@ func TestMysqlType(t *testing.T) {
 		{"double", "double", "float"},
 		{"decimal", "decimal", "string"},
 		{"enum", "enum", "string"},
-		{"date", "date", "\\DateTimeImmutable"},
+		{"date", "date", "string"},
 		{"boolean", "boolean", "bool"},
 		{"json", "json", "array"},
 		{"any", "any", "mixed"},

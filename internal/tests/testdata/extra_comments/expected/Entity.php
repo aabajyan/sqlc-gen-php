@@ -16,8 +16,8 @@ final readonly class Entity {
         public int $locked,
         public string $lockedMessage,
         public ?string $ownerId,
-        public \DateTimeImmutable $createdAt,
-        public \DateTimeImmutable $updatedAt,
+        public string $createdAt,
+        public string $updatedAt,
     )
     {}
 }

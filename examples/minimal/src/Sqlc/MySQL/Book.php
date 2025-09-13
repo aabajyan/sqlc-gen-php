@@ -17,7 +17,7 @@ final readonly class Book {
         // UUID
         public string $title,
         public int $yr,
-        public \DateTimeImmutable $available,
+        public string $available,
         public string $tags,
     )
     {}

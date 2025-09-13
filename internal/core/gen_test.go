@@ -53,18 +53,6 @@ func TestMemberName(t *testing.T) {
 	}
 }
 
-func TestPdoRowMapping(t *testing.T) {
-	datetime := phpType{Name: "\\DateTimeImmutable"}
-	normal := phpType{Name: "int"}
-	if got := pdoRowMapping(datetime, 0); got != "new \\DateTimeImmutable($row[0])" {
-		t.Errorf("pdoRowMapping(datetime) = %q", got)
-	}
-
-	if got := pdoRowMapping(normal, 0); got != "$row[0]" {
-		t.Errorf("pdoRowMapping(normal) = %q", got)
-	}
-}
-
 func TestPhpParamName(t *testing.T) {
 	col := &plugin.Column{Name: "foo"}
 	if got := phpParamName(col, 1); got != "foo" {

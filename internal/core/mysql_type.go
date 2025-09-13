@@ -29,7 +29,7 @@ func mysqlType(col *plugin.Column) string {
 		return "string"
 
 	case "date", "datetime", "time", "timestamp":
-		return "\\DateTimeImmutable"
+		return "string"
 
 	case "boolean", "bool", "tinyint":
 		return "bool"

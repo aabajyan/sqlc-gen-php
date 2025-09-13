@@ -47,7 +47,7 @@ final readonly class QueriesImpl implements Queries {
         $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         foreach ($results as $row) {
-            $ret[] = new Entity($row[0], $row[1], json_decode($row[2], true) ?? [], $row[3], $row[4], $row[5], new \DateTimeImmutable($row[6]), new \DateTimeImmutable($row[7]));
+            $ret[] = new Entity($row[0], $row[1], json_decode($row[2], true) ?? [], $row[3], $row[4], $row[5], $row[6], $row[7]);
         }
         return $ret;
     }

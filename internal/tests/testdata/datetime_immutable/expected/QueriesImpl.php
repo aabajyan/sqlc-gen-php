@@ -30,20 +30,20 @@ final readonly class QueriesImpl implements Queries {
     /**
      * @throws \Exception
      */
-    public function addAuthor(string $name, ?\DateTimeImmutable $createdAt): void
+    public function addAuthor(string $name, ?string $createdAt): void
     {
         $stmt = $this->pdo->prepare(addAuthor);
-        $stmt->execute([$name, $createdAt?->format('Y-m-d H:i:s')]);
+        $stmt->execute([$name, $createdAt]);
     }
 
     /**
      * @return Author|null
      * @throws \Exception
      */
-    public function getAuthorByCreatedAt(\DateTimeImmutable $createdAt): ?Author
+    public function getAuthorByCreatedAt(string $createdAt): ?Author
     {
         $stmt = $this->pdo->prepare(getAuthorByCreatedAt);
-        $stmt->execute([$createdAt->format('Y-m-d H:i:s')]);
+        $stmt->execute([$createdAt]);
         $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
         if(count($results) != 1){
@@ -51,7 +51,7 @@ final readonly class QueriesImpl implements Queries {
         }
 
         $row = $results[0];
-        $ret[] = new Author($row[0], $row[1], new \DateTimeImmutable($row[2]));
+        $ret[] = new Author($row[0], $row[1], $row[2]);
         return $ret[0];
     }
 

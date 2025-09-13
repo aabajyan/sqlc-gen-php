@@ -26,14 +26,7 @@ interface Queries {
   
   public function createAuthor(string $name): int|string;
   
-  public function createBook(
-      int $authorId,
-      string $isbn,
-      string $bookType,
-      mixed $uuidToBin,
-      int $yr,
-      \DateTimeImmutable $available,
-      string $tags): int|string;
+  public function createBook(int $authorId, string $isbn, string $bookType, mixed $uuidToBin, int $yr, string $available, string $tags): int|string;
   
   public function deleteAuthorBeforeYear(int $yr, int $authorId): void;
   
@@ -48,16 +41,9 @@ interface Queries {
   */
   public function listAuthors(): array;
   
-  public function updateBook(
-      string $title,
-      string $tags,
-      int $bookId): void;
+  public function updateBook(string $title, string $tags, int $bookId): void;
   
-  public function updateBookISBN(
-      string $title,
-      string $tags,
-      string $isbn,
-      int $bookId): void;
+  public function updateBookISBN(string $title, string $tags, string $isbn, int $bookId): void;
   
 }
 

@@ -101,10 +101,6 @@ func (t phpType) IsBoolean() bool {
 	return t.Name == "bool"
 }
 
-func (t phpType) IsDateTimeImmutable() bool {
-	return t.Name == "\\DateTimeImmutable"
-}
-
 func (t phpType) IsJSON() bool {
 	return t.Name == "array"
 }

@@ -22,7 +22,7 @@ func sqliteType(col *plugin.Column) string {
 	case "boolean":
 		return "bool"
 	case "date", "datetime":
-		return "\\DateTimeImmutable"
+		return "string"
 	case "numeric":
 		return "string"
 	case "json":

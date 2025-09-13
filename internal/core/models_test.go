@@ -21,18 +21,6 @@ func TestPhpType_String(t *testing.T) {
 	}
 }
 
-func TestPhpType_IsDateTimeImmutable(t *testing.T) {
-	pt := phpType{Name: "\\DateTimeImmutable"}
-	if !pt.IsDateTimeImmutable() {
-		t.Errorf("IsDateTimeImmutable() should be true for \\DateTimeImmutable")
-	}
-
-	pt = phpType{Name: "int"}
-	if pt.IsDateTimeImmutable() {
-		t.Errorf("IsDateTimeImmutable() should be false for int")
-	}
-}
-
 func TestPhpType_IsInt(t *testing.T) {
 	pt := phpType{Name: "int"}
 	if !pt.IsInt() {

@@ -17,7 +17,7 @@ func TestSqliteType(t *testing.T) {
 		{"real", "real", "float"},
 		{"blob", "blob", "string"},
 		{"boolean", "boolean", "bool"},
-		{"date", "date", "\\DateTimeImmutable"},
+		{"date", "date", "string"},
 		{"numeric", "numeric", "string"},
 		{"json", "json", "array"},
 		{"any", "any", "mixed"},
