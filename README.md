@@ -1,5 +1,7 @@
 # SQLC PHP PDO Plugin (Fork)
 
+> ⚠️ **Warning:** This project is in a very early stage. Expect bugs and breaking changes. Use with caution in production environments.
+
 A fork of the original SQLC plugin, this version generates PHP code using native PDO for type-safe database operations. It allows you to write SQL queries and automatically generates PHP classes with proper type hints and database abstraction, without requiring Doctrine DBAL.
 
 ## Features
@@ -22,12 +24,12 @@ A fork of the original SQLC plugin, this version generates PHP code using native
 2. Add the plugin to your `sqlc.yaml` configuration:
 
 ```yaml
-version: '2'
+version: "2"
 plugins:
-- name: php
-  wasm:
-    url: https://github.com/aabajyan/sqlc-gen-php/releases/download/v0.0.3/sqlc-gen-php.wasm
-    sha256: c54aebed19d5c7961127821c0bac84c8bb00e39d8a0eca05b1710b438e17cbe2
+  - name: php
+    wasm:
+      url: https://github.com/aabajyan/sqlc-gen-php/releases/download/v0.0.15/sqlc-gen-php.wasm
+      sha256: 950c201f00b8dbe4045c09a206793cc413ff8133c1d5e512b9e57a20427b046a
 ```
 
 ## Configuration
@@ -36,14 +38,14 @@ Configure your SQL queries in `sqlc.yaml`:
 
 ```yaml
 sql:
-- schema: sqlc/authors/mysql/schema.sql
-  queries: sqlc/authors/mysql/query.sql
-  engine: mysql # or sqlite
-  codegen:
-    - out: src/Sqlc/MySQL
-      plugin: php
-      options:
-        package: "App\\Sqlc\\MySQL" # or your preferred namespace
+  - schema: sqlc/authors/mysql/schema.sql
+    queries: sqlc/authors/mysql/query.sql
+    engine: mysql # or sqlite
+    codegen:
+      - out: src/Sqlc/MySQL
+        plugin: php
+        options:
+          package: "App\\Sqlc\\MySQL" # or your preferred namespace
 ```
 
 Example of a complete `sqlc.yaml` config:
@@ -53,8 +55,8 @@ version: '2'
 plugins:
 - name: php
   wasm:
-    url: https://github.com/aabajyan/sqlc-gen-php/releases/download/v0.0.3/sqlc-gen-php.wasm
-    sha256: c54aebed19d5c7961127821c0bac84c8bb00e39d8a0eca05b1710b438e17cbe2
+    url: https://github.com/aabajyan/sqlc-gen-php/releases/download/v0.0.15/sqlc-gen-php.wasm
+    sha256: 950c201f00b8dbe4045c09a206793cc413ff8133c1d5e512b9e57a20427b046a
 sql:
 - schema: sqlc/authors/mysql/schema.sql
   queries: sqlc/authors/mysql/query.sql
