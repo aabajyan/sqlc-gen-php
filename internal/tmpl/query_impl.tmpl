@@ -34,25 +34,23 @@ final readonly class QueriesImpl implements Queries {
         $stmt = $this->pdo->prepare({{.ConstantName}});
         $stmt->execute({{ .Arg.Bindings }});
         $results = $stmt->fetchAll({{.Ret.PDOFetchMode}});
-        $ret = [];
         {
             $count = count($results);
             if ($count === 0) {
                 return null;
             }
             
-            if ($count !== 1){
+            if ($count !== 1) {
                 throw new \Exception('Expected exactly 1 row, but got ' . $count);
             }
         }
 
         $row = $results[0];
         {{- if .Ret.IsClass }}
-        $ret[] = new {{.Ret.Type}}({{.Ret.ResultSet}});
+        return new {{.Ret.Type}}({{.Ret.ResultSet}});
         {{- else }}
-        $ret[] = ({{.Ret.Type}})({{.Ret.ResultSet}});
+        return ({{.Ret.Type}})({{.Ret.ResultSet}});
         {{- end }}
-        return $ret[0];
     }
 {{end}}
 

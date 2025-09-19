@@ -29,21 +29,19 @@ final readonly class QueriesImpl implements Queries {
         $stmt = $this->pdo->prepare(getFlag);
         $stmt->execute();
         $results = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-        $ret = [];
         {
             $count = count($results);
             if ($count === 0) {
                 return null;
             }
             
-            if ($count !== 1){
+            if ($count !== 1) {
                 throw new \Exception('Expected exactly 1 row, but got ' . $count);
             }
         }
 
         $row = $results[0];
-        $ret[] = (bool)($row);
-        return $ret[0];
+        return (bool)($row);
     }
 
 }

@@ -226,21 +226,19 @@ final readonly class QueriesImpl implements Queries {
         $stmt = $this->pdo->prepare(getAuthor);
         $stmt->execute([$authorId]);
         $results = $stmt->fetchAll(\PDO::FETCH_NUM);
-        $ret = [];
         {
             $count = count($results);
             if ($count === 0) {
                 return null;
             }
-
-            if($count !== 1){
+            
+            if ($count !== 1) {
                 throw new \Exception('Expected exactly 1 row, but got ' . $count);
             }
         }
 
         $row = $results[0];
-        $ret[] = new Author($row[0], $row[1]);
-        return $ret[0];
+        return new Author($row[0], $row[1]);
     }
 
     /**
@@ -252,21 +250,19 @@ final readonly class QueriesImpl implements Queries {
         $stmt = $this->pdo->prepare(getBook);
         $stmt->execute([$bookId]);
         $results = $stmt->fetchAll(\PDO::FETCH_NUM);
-        $ret = [];
         {
             $count = count($results);
             if ($count === 0) {
                 return null;
             }
-
-            if($count !== 1){
+            
+            if ($count !== 1) {
                 throw new \Exception('Expected exactly 1 row, but got ' . $count);
             }
         }
 
         $row = $results[0];
-        $ret[] = new Book($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7]);
-        return $ret[0];
+        return new Book($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7]);
     }
 
     /**

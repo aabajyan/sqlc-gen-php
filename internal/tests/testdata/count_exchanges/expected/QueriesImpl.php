@@ -45,21 +45,19 @@ final readonly class QueriesImpl implements Queries {
         $stmt = $this->pdo->prepare(countExchanges);
         $stmt->execute();
         $results = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-        $ret = [];
         {
             $count = count($results);
             if ($count === 0) {
                 return null;
             }
             
-            if ($count !== 1){
+            if ($count !== 1) {
                 throw new \Exception('Expected exactly 1 row, but got ' . $count);
             }
         }
 
         $row = $results[0];
-        $ret[] = (int)($row);
-        return $ret[0];
+        return (int)($row);
     }
 
     /**
@@ -87,21 +85,19 @@ final readonly class QueriesImpl implements Queries {
         $stmt = $this->pdo->prepare(getIdByName);
         $stmt->execute([$name]);
         $results = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-        $ret = [];
         {
             $count = count($results);
             if ($count === 0) {
                 return null;
             }
             
-            if ($count !== 1){
+            if ($count !== 1) {
                 throw new \Exception('Expected exactly 1 row, but got ' . $count);
             }
         }
 
         $row = $results[0];
-        $ret[] = (int)($row);
-        return $ret[0];
+        return (int)($row);
     }
 
 }
