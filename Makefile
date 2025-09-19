@@ -17,10 +17,10 @@ bin/sqlc-gen-php.wasm:
 sqlc.yaml: bin/sqlc-gen-php.wasm
 	rm -f sqlc.yaml
 	cp examples/minimal/sqlc.yaml sqlc.yaml
-	sha256sum bin/sqlc-gen-php.wasm | awk '{print $$1}' | xargs -I {} sed -i 's/sha256: .*/sha256: {}/' sqlc.yaml
-	sed -i "s|url: .*|url: file://$(PWD)/bin/sqlc-gen-php.wasm|" sqlc.yaml
-	sed -i "s|sqlc/|examples/minimal/sqlc/|g" sqlc.yaml
-	sed -i "s|src/Sqlc|examples/minimal/src/Sqlc|g" sqlc.yaml
+	sha256sum bin/sqlc-gen-php.wasm | awk '{print $$1}' | xargs -I {} sed -i '' 's/sha256: .*/sha256: {}/' sqlc.yaml
+	sed -i '' "s|url: .*|url: file://$(PWD)/bin/sqlc-gen-php.wasm|" sqlc.yaml
+	sed -i '' "s|sqlc/|examples/minimal/sqlc/|g" sqlc.yaml
+	sed -i '' "s|src/Sqlc|examples/minimal/src/Sqlc|g" sqlc.yaml
 
 generate: sqlc.yaml
 

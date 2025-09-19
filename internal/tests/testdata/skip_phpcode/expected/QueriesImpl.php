@@ -30,8 +30,15 @@ final readonly class QueriesImpl implements Queries {
         $stmt->execute();
         $results = $stmt->fetchAll(\PDO::FETCH_COLUMN);
         $ret = [];
-        if(count($results) != 1){
-            throw new \Exception('Expected exactly 1 row, but got ' . count($results));
+        {
+            $count = count($results);
+            if ($count === 0) {
+                return null;
+            }
+            
+            if ($count !== 1){
+                throw new \Exception('Expected exactly 1 row, but got ' . $count);
+            }
         }
 
         $row = $results[0];

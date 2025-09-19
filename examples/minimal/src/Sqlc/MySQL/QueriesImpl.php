@@ -227,8 +227,15 @@ final readonly class QueriesImpl implements Queries {
         $stmt->execute([$authorId]);
         $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
-        if(count($results) != 1){
-            throw new \Exception('Expected exactly 1 row, but got ' . count($results));
+        {
+            $count = count($results);
+            if ($count === 0) {
+                return null;
+            }
+
+            if($count !== 1){
+                throw new \Exception('Expected exactly 1 row, but got ' . $count);
+            }
         }
 
         $row = $results[0];
@@ -246,8 +253,15 @@ final readonly class QueriesImpl implements Queries {
         $stmt->execute([$bookId]);
         $results = $stmt->fetchAll(\PDO::FETCH_NUM);
         $ret = [];
-        if(count($results) != 1){
-            throw new \Exception('Expected exactly 1 row, but got ' . count($results));
+        {
+            $count = count($results);
+            if ($count === 0) {
+                return null;
+            }
+
+            if($count !== 1){
+                throw new \Exception('Expected exactly 1 row, but got ' . $count);
+            }
         }
 
         $row = $results[0];
